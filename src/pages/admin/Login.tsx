@@ -8,7 +8,7 @@ import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
 import { Checkbox } from "../../components/ui/checkbox";
 import { useAuth } from "../../components/admin/AuthContext";
-import logo from "figma:asset/d2a86183f3650ad510e5554066e364f7473a20fa.png";
+import logo from "../../assets/d2a86183f3650ad510e5554066e364f7473a20fa.png";
 
 export default function AdminLogin() {
   const [showPassword, setShowPassword] = useState(false);

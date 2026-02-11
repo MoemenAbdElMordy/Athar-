@@ -1,7 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 import { useState } from 'react';
-import logo from 'figma:asset/d2a86183f3650ad510e5554066e364f7473a20fa.png';
+import logo from '../assets/d2a86183f3650ad510e5554066e364f7473a20fa.png';
 
 export function Header() {
   const location = useLocation();

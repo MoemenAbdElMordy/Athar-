@@ -2,7 +2,7 @@ import { Download, Heart, Users, MapPin, BookOpen, Compass, Link as LinkIcon, Na
 import { Link } from 'react-router-dom';
 import { Button } from '../components/Button';
 import AccessibilityMappingAppMvp from '../imports/AccessibilityMappingAppMvp';
-import appScreenshot from 'figma:asset/867383944f5c71c33307d290247e80bee73b0125.png';
+import appScreenshot from '../assets/867383944f5c71c33307d290247e80bee73b0125.png';
 
 export function Home() {
   return (
