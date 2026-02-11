@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Athar - About Us</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #EAF2FB;
+      color: #1F3C5B;
+    }
+    
+    h1 {
+      font-size: 56px;
+      font-weight: 700;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      color: #1F3C5B;
+    }
+    
+    h2 {
+      font-size: 38px;
+      font-weight: 600;
+      line-height: 1.2;
+      letter-spacing: -0.01em;
+      color: #1F3C5B;
+    }
+    
+    h3 {
+      font-size: 26px;
+      font-weight: 600;
+      line-height: 1.5;
+      color: #1F3C5B;
+    }
+    
+    p, li {
+      font-size: 19px;
+      line-height: 1.8;
+    }
+    
+    .hero-text {
+      font-size: 22px;
+      line-height: 1.7;
+    }
+    
+    /* Print styles for full-page PDF export */
+    @media print {
+      body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        background-color: #EAF2FB !important;
+      }
+      
+      section {
+        page-break-inside: avoid;
+        break-inside: avoid;
+        background-color: #EAF2FB !important;
+      }
+      
+      header, footer {
+        page-break-inside: avoid;
+      }
+      
+      * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        color-adjust: exact !important;
+      }
+    }
+  </style>
+</head>
+<body class="bg-[#EAF2FB]">
+  
+  <!-- Header -->
+  <header class="bg-white border-b-2 border-gray-300 shadow-sm">
+    <nav class="max-w-7xl mx-auto px-6 lg:px-8">
+      <div class="flex items-center justify-between h-28">
+        <a href="home.html" class="flex items-center ml-16">
+          <span class="text-4xl text-teal-600" style="font-weight: 700;">Athar</span>
+        </a>
+        <div class="flex items-center gap-10">
+          <a href="home.html" class="text-gray-900 hover:text-teal-600 font-semibold" style="font-weight: 600;">Home</a>
+          <a href="about.html" class="text-teal-700 font-bold" style="font-weight: 700;">About</a>
+          <a href="how-it-works.html" class="text-gray-900 hover:text-teal-600 font-semibold" style="font-weight: 600;">How It Works</a>
+          <a href="tutorials.html" class="text-gray-900 hover:text-teal-600 font-semibold" style="font-weight: 600;">Tutorials</a>
+          <a href="volunteer.html" class="text-gray-900 hover:text-teal-600 font-semibold" style="font-weight: 600;">Volunteer</a>
+          <a href="contact.html" class="text-gray-900 hover:text-teal-600 font-semibold" style="font-weight: 600;">Contact</a>
+          <a href="#" class="px-6 py-3 bg-teal-600 text-white hover:bg-teal-700 transition-all shadow-md rounded-xl ml-4" style="font-weight: 600;">Get the App</a>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <!-- Hero Title -->
+    <section class="py-32 border-b-4 border-teal-600">
+      <div class="max-w-4xl mx-auto px-6 lg:px-8">
+        <div class="border-l-8 border-teal-700 pl-10">
+          <h1 class="mb-6">About Athar</h1>
+          <p class="hero-text text-gray-800">
+            Athar is more than an accessibility platform — it's a movement toward inclusive communities where everyone can participate fully in public life.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Content Sections -->
+    <section class="py-32">
+      <div class="max-w-4xl mx-auto px-6 lg:px-8">
+        <h2 class="mb-12">Why Athar exists</h2>
+        <div class="space-y-8 text-gray-800">
+          <p>People of determination face countless barriers when navigating public spaces. From unclear accessibility information to lack of support when needed, these challenges limit independence and participation in everyday activities.</p>
+          <p>We created Athar to address this gap. By combining comprehensive accessibility information with a compassionate volunteer network, we're building a support system that empowers people to move through the world with confidence.</p>
+          <p>Our platform was born from listening to the real experiences of people with disabilities, their families, and support workers. We understand that accessibility isn't just about ramps — it's about dignity, independence, and community.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="py-32 bg-white/30">
+      <div class="max-w-4xl mx-auto px-6 lg:px-8">
+        <h2 class="mb-12 text-right">Our mission</h2>
+        <div class="space-y-8 text-gray-800 border-r-8 border-orange-500 pr-10 text-right">
+          <p>To create a world where accessibility is the norm, not the exception. We're working to ensure that every person, regardless of ability, can access the information and support they need to live independently.</p>
+          <ul class="space-y-4 list-none font-bold text-teal-700 text-xl">
+            <li>Building reliable information people trust •</li>
+            <li>Connecting people with ready volunteers •</li>
+            <li>Educating communities about inclusion •</li>
+            <li>Advocating for better global standards •</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="py-32">
+      <div class="max-w-4xl mx-auto px-6 lg:px-8">
+        <h2 class="mb-16">Our approach</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-16">
+          <div>
+            <h3 class="mb-4">Community-centered</h3>
+            <p>Athar is built by listening to people of determination. Every design decision comes from understanding real needs and experiences.</p>
+          </div>
+          <div>
+            <h3 class="mb-4">Technology as enabler</h3>
+            <p>We use technology as a tool to remove barriers. Our platform is designed to be accessible, intuitive, and reliable.</p>
+          </div>
+          <div>
+            <h3 class="mb-4">Compassion and dignity</h3>
+            <p>Respect for human dignity is at our heart. Our volunteer network is trained in empowerment, choice, and independence.</p>
+          </div>
+          <div>
+            <h3 class="mb-4">Continuous improvement</h3>
+            <p>Accessibility needs evolve, and so do we. We're committed to constantly learning and adapting based on user feedback.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="py-32 bg-teal-600 text-white">
+      <div class="max-w-5xl mx-auto px-6 lg:px-8">
+        <h2 class="text-white mb-20 text-center">Athar by the numbers</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-16 text-center">
+          <div>
+            <div class="text-6xl font-bold mb-4">1,000+</div>
+            <p class="text-xl opacity-90">Locations mapped</p>
+          </div>
+          <div>
+            <div class="text-6xl font-bold mb-4">500+</div>
+            <p class="text-xl opacity-90">Active volunteers</p>
+          </div>
+          <div>
+            <div class="text-6xl font-bold mb-4">10,000+</div>
+            <p class="text-xl opacity-90">People supported</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t-2 border-gray-300">
+    <div class="max-w-7xl mx-auto px-6 lg:px-8 py-16">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-12 text-gray-900">
+        <div>
+          <h3 class="text-teal-700 mb-6 font-bold">About Athar</h3>
+          <p>Empowering people of determination through accessibility and community support.</p>
+        </div>
+        <div>
+          <h3 class="text-teal-700 mb-6 font-bold">Quick Links</h3>
+          <ul class="space-y-4 font-semibold">
+            <li><a href="home.html" class="hover:text-teal-600">Home</a></li>
+            <li><a href="about.html" class="hover:text-teal-600">About</a></li>
+            <li><a href="how-it-works.html" class="hover:text-teal-600">How It Works</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-teal-700 mb-6 font-bold">Resources</h3>
+          <ul class="space-y-4 font-semibold">
+            <li><a href="tutorials.html" class="hover:text-teal-600">Tutorials</a></li>
+            <li><a href="volunteer.html" class="hover:text-teal-600">Become a Volunteer</a></li>
+            <li><a href="contact.html" class="hover:text-teal-600">Contact Us</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-teal-700 mb-6 font-bold">Legal</h3>
+          <ul class="space-y-4 font-semibold">
+            <li><a href="#" class="hover:text-teal-600">Privacy Policy</a></li>
+            <li><a href="#" class="hover:text-teal-600">Terms of Service</a></li>
+            <li><a href="#" class="hover:text-teal-600">Accessibility Statement</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="mt-16 pt-8 border-t-2 border-gray-200 text-center font-bold">
+        © 2026 Athar. All rights reserved.
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

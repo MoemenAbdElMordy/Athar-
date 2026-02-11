@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Athar - Become a Volunteer</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #EAF2FB;
+      color: #1F3C5B;
+    }
+    
+    h1 {
+      font-size: 48px;
+      font-weight: 700;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+      color: #1F3C5B;
+    }
+    
+    h2 {
+      font-size: 34px;
+      font-weight: 600;
+      line-height: 1.2;
+      letter-spacing: -0.01em;
+      color: #1F3C5B;
+    }
+    
+    h3 {
+      font-size: 26px;
+      font-weight: 600;
+      line-height: 1.4;
+      color: #1F3C5B;
+    }
+    
+    p, li {
+      font-size: 18px;
+      line-height: 1.75;
+    }
+    
+    .hero-text {
+      font-size: 20px;
+      line-height: 1.7;
+    }
+    
+    label {
+      font-weight: 700;
+      font-size: 15px;
+      color: #1F3C5B;
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+    
+    input, select, textarea {
+      width: 100%;
+      padding: 1rem 1.25rem;
+      border: 1px solid #d1d5db;
+      border-radius: 0.75rem;
+      background-color: white;
+      font-size: 16px;
+      margin-bottom: 1.5rem;
+    }
+    
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: #0D9488;
+      box-shadow: 0 0 0 4px rgba(13, 148, 136, 0.1);
+    }
+    
+    /* Print styles for full-page PDF export */
+    @media print {
+      body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        background-color: #EAF2FB !important;
+      }
+      
+      section {
+        page-break-inside: avoid;
+        break-inside: avoid;
+        background-color: #EAF2FB !important;
+      }
+      
+      header, footer {
+        page-break-inside: avoid;
+      }
+      
+      form {
+        display: none; /* Usually forms are not printed in brochures */
+      }
+      
+      .print-only {
+        display: block !important;
+      }
+      
+      * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        color-adjust: exact !important;
+      }
+    }
+    
+    .print-only {
+      display: none;
+    }
+  </style>
+</head>
+<body class="bg-[#EAF2FB]">
+  
+  <!-- Header -->
+  <header class="bg-white border-b-2 border-gray-300 shadow-sm">
+    <nav class="max-w-7xl mx-auto px-6 lg:px-8">
+      <div class="flex items-center justify-between h-28">
+        <a href="home.html" class="flex items-center ml-16">
+          <span class="text-4xl text-teal-600" style="font-weight: 700;">Athar</span>
+        </a>
+        <div class="flex items-center gap-10">
+          <a href="home.html" class="text-gray-900 hover:text-teal-600" style="font-weight: 600;">Home</a>
+          <a href="about.html" class="text-gray-900 hover:text-teal-600" style="font-weight: 600;">About</a>
+          <a href="how-it-works.html" class="text-gray-900 hover:text-teal-600" style="font-weight: 600;">How It Works</a>
+          <a href="tutorials.html" class="text-gray-900 hover:text-teal-600" style="font-weight: 600;">Tutorials</a>
+          <a href="volunteer.html" class="text-teal-700" style="font-weight: 700;">Volunteer</a>
+          <a href="contact.html" class="text-gray-900 hover:text-teal-600" style="font-weight: 600;">Contact</a>
+          <a href="#" class="px-6 py-3 bg-teal-600 text-white hover:bg-teal-700 transition-all shadow-md rounded-xl ml-4" style="font-weight: 600;">Get the App</a>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <!-- Hero Section -->
+    <section class="py-32 border-b-4 border-teal-600">
+      <div class="max-w-4xl mx-auto px-6 lg:px-8">
+        <div class="flex items-center gap-6 mb-8">
+          <div class="w-20 h-20 rounded-full bg-teal-100 flex items-center justify-center text-teal-600">
+            <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+          </div>
+          <h1 class="m-0">Become a volunteer</h1>
+        </div>
+        <p class="hero-text text-gray-800 max-w-3xl">
+          Join our community of compassionate volunteers making a real difference in people's lives. Help create a more accessible and inclusive world by offering your time and support to people of determination.
+        </p>
+      </div>
+    </section>
+
+    <!-- Content and Form -->
+    <section class="py-24">
+      <div class="max-w-7xl mx-auto px-6 lg:px-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-16">
+          
+          <!-- Left: Form -->
+          <div class="lg:col-span-2">
+            <div class="bg-white p-12 rounded-2xl shadow-sm border border-gray-200">
+              <h2 class="mb-8">Volunteer application</h2>
+              <p class="mb-10 text-gray-600">Complete the form below to start your journey as an Athar volunteer. All fields marked with * are required.</p>
+              
+              <form action="#">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6">
+                  <div>
+                    <label>First name *</label>
+                    <input type="text" placeholder="Your first name">
+                  </div>
+                  <div>
+                    <label>Last name *</label>
+                    <input type="text" placeholder="Your last name">
+                  </div>
+                </div>
+                
+                <div>
+                  <label>Email address *</label>
+                  <input type="email" placeholder="email@example.com">
+                </div>
+                
+                <div>
+                  <label>Phone number *</label>
+                  <input type="tel" placeholder="+971 50 000 0000">
+                </div>
+                
+                <div>
+                  <label>City / Location *</label>
+                  <input type="text" placeholder="Dubai, Abu Dhabi, etc.">
+                </div>
+                
+                <div>
+                  <label>When can you volunteer? *</label>
+                  <select>
+                    <option value="">Select availability</option>
+                    <option>Weekdays</option>
+                    <option>Weekends</option>
+                    <option>Flexible</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label>Why do you want to volunteer? *</label>
+                  <textarea rows="5" placeholder="Share your motivation..."></textarea>
+                </div>
+                
+                <div class="pt-6">
+                  <button type="submit" class="w-full bg-teal-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-teal-700 transition-all shadow-md">
+                    Submit Application
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+          
+          <!-- Right: Expectations -->
+          <div class="space-y-12">
+            <div>
+              <h2 class="mb-8">What we expect</h2>
+              <div class="space-y-8">
+                <div class="flex gap-4">
+                  <div class="text-teal-600 flex-shrink-0">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>
+                  </div>
+                  <div>
+                    <h3 class="text-xl mb-2">Compassion and respect</h3>
+                    <p class="text-base text-gray-700">Treat everyone with dignity and care, understanding that each person's needs are unique.</p>
+                  </div>
+                </div>
+                <div class="flex gap-4">
+                  <div class="text-teal-600 flex-shrink-0">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>
+                  </div>
+                  <div>
+                    <h3 class="text-xl mb-2">Reliability</h3>
+                    <p class="text-base text-gray-700">Show up when you commit to helping. People are counting on you for important activities.</p>
+                  </div>
+                </div>
+                <div class="flex gap-4">
+                  <div class="text-teal-600 flex-shrink-0">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>
+                  </div>
+                  <div>
+                    <h3 class="text-xl mb-2">Clear communication</h3>
+                    <p class="text-base text-gray-700">Respond promptly to requests and communicate openly about your availability.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="bg-amber-100 p-8 rounded-2xl border-l-8 border-amber-500">
+              <h3 class="text-xl mb-4 font-bold">Training provided</h3>
+              <p class="text-base text-gray-800">All volunteers receive comprehensive training on disability awareness, communication strategies, and safety protocols before being matched.</p>
+            </div>
+          </div>
+          
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t-2 border-gray-300 mt-32">
+    <div class="max-w-7xl mx-auto px-6 lg:px-8 py-16">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-12 text-gray-900">
+        <div>
+          <h3 class="text-teal-700 mb-6 font-bold">About Athar</h3>
+          <p>Empowering people of determination through accessibility and community support.</p>
+        </div>
+        <div>
+          <h3 class="text-teal-700 mb-6 font-bold">Quick Links</h3>
+          <ul class="space-y-4 font-semibold">
+            <li><a href="home.html" class="hover:text-teal-600">Home</a></li>
+            <li><a href="about.html" class="hover:text-teal-600">About</a></li>
+            <li><a href="how-it-works.html" class="hover:text-teal-600">How It Works</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-teal-700 mb-6 font-bold">Resources</h3>
+          <ul class="space-y-4 font-semibold">
+            <li><a href="tutorials.html" class="hover:text-teal-600">Tutorials</a></li>
+            <li><a href="volunteer.html" class="hover:text-teal-600">Become a Volunteer</a></li>
+            <li><a href="contact.html" class="hover:text-teal-600">Contact Us</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-teal-700 mb-6 font-bold">Legal</h3>
+          <ul class="space-y-4 font-semibold">
+            <li><a href="#" class="hover:text-teal-600">Privacy Policy</a></li>
+            <li><a href="#" class="hover:text-teal-600">Terms of Service</a></li>
+            <li><a href="#" class="hover:text-teal-600">Accessibility Statement</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="mt-16 pt-8 border-t-2 border-gray-200 text-center font-bold">
+        © 2026 Athar. All rights reserved.
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

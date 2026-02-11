@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Athar - How It Works</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #EAF2FB;
+      color: #1F3C5B;
+    }
+    
+    h1 {
+      font-size: 48px;
+      font-weight: 700;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+      color: #1F3C5B;
+    }
+    
+    h2 {
+      font-size: 34px;
+      font-weight: 600;
+      line-height: 1.2;
+      letter-spacing: -0.01em;
+      color: #1F3C5B;
+    }
+    
+    h3 {
+      font-size: 26px;
+      font-weight: 600;
+      line-height: 1.6;
+      color: #1F3C5B;
+    }
+    
+    p, li {
+      font-size: 18px;
+      line-height: 1.75;
+    }
+    
+    .hero-text {
+      font-size: 20px;
+      line-height: 1.7;
+    }
+    
+    .bg-brand-light { background-color: #EAF2FB; }
+    .text-brand-navy { color: #1F3C5B; }
+    .text-brand-gold { color: #C9A24D; }
+    
+    /* Print styles for full-page PDF export */
+    @media print {
+      body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        background-color: #EAF2FB !important;
+      }
+      
+      section {
+        page-break-inside: avoid;
+        break-inside: avoid;
+        background-color: #EAF2FB !important;
+      }
+      
+      header, footer {
+        page-break-inside: avoid;
+      }
+      
+      * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        color-adjust: exact !important;
+      }
+    }
+  </style>
+</head>
+<body class="bg-brand-light">
+  
+  <!-- Header -->
+  <header class="bg-white border-b-2 border-gray-300 shadow-sm">
+    <nav class="max-w-7xl mx-auto px-6 lg:px-8">
+      <div class="flex items-center justify-between h-28">
+        <a href="home.html" class="flex items-center ml-16">
+          <span class="text-4xl text-teal-600" style="font-weight: 700;">Athar</span>
+        </a>
+        <div class="flex items-center gap-10">
+          <a href="home.html" class="text-gray-900 hover:text-teal-600" style="font-weight: 600;">Home</a>
+          <a href="about.html" class="text-gray-900 hover:text-teal-600" style="font-weight: 600;">About</a>
+          <a href="how-it-works.html" class="text-teal-700" style="font-weight: 700;">How It Works</a>
+          <a href="tutorials.html" class="text-gray-900 hover:text-teal-600" style="font-weight: 600;">Tutorials</a>
+          <a href="volunteer.html" class="text-gray-900 hover:text-teal-600" style="font-weight: 600;">Volunteer</a>
+          <a href="contact.html" class="text-gray-900 hover:text-teal-600" style="font-weight: 600;">Contact</a>
+          <a href="#" class="px-6 py-3 bg-teal-600 text-white hover:bg-teal-700 transition-all shadow-md rounded-xl ml-4" style="font-weight: 600;">Get the App</a>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Main Content -->
+  <main>
+    <!-- Hero Title -->
+    <section class="py-32 border-b-4 border-teal-600">
+      <div class="max-w-4xl mx-auto px-6 lg:px-8">
+        <div class="border-l-8 border-teal-700 pl-10">
+          <h1 class="mb-6">How Athar works</h1>
+          <p class="hero-text text-gray-800">
+            Athar combines accessibility information, community support, and educational resources to empower people of determination. Here's how our platform helps you navigate the world with confidence.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Getting Started -->
+    <section class="py-24">
+      <div class="max-w-4xl mx-auto px-6 lg:px-8">
+        <h2 class="mb-16">Getting started with Athar</h2>
+
+        <div class="space-y-20">
+          <!-- Step 1 -->
+          <div class="flex gap-10">
+            <div class="flex-shrink-0">
+              <div class="w-16 h-16 rounded-full bg-teal-600 text-white flex items-center justify-center text-2xl font-bold">1</div>
+            </div>
+            <div>
+              <h3 class="mb-4">Download the Athar app</h3>
+              <p class="mb-6">
+                Available on iOS and Android, the Athar mobile app is your gateway to accessibility information and community support. Create a free account to get started.
+              </p>
+              <div class="bg-white/50 border-l-4 border-teal-600 p-6 rounded-r-xl">
+                <p class="font-bold text-teal-800">
+                  The mobile app is required for core features like finding accessible places and connecting with volunteers.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 2 -->
+          <div class="flex gap-10">
+            <div class="flex-shrink-0">
+              <div class="w-16 h-16 rounded-full bg-teal-600 text-white flex items-center justify-center text-2xl font-bold">2</div>
+            </div>
+            <div>
+              <h3 class="mb-4">Set up your profile</h3>
+              <p>
+                Tell us about your accessibility needs and preferences. This helps us provide relevant information and match you with appropriate volunteers when needed. Your privacy is protected — share only what you're comfortable with.
+              </p>
+            </div>
+          </div>
+
+          <!-- Step 3 -->
+          <div class="flex gap-10">
+            <div class="flex-shrink-0">
+              <div class="w-16 h-16 rounded-full bg-teal-600 text-white flex items-center justify-center text-2xl font-bold">3</div>
+            </div>
+            <div>
+              <h3 class="mb-4">Explore tutorials and resources</h3>
+              <p>
+                Browse our comprehensive learning resources on this website. From understanding accessibility features to tips for using assistive technologies, we provide guidance for all experience levels.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Finding Accessible Places -->
+    <section class="py-32 bg-white/30">
+      <div class="max-w-5xl mx-auto px-6 lg:px-8">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center mb-20">
+          <div>
+            <div class="flex items-center gap-4 mb-8">
+              <div class="w-14 h-14 rounded-full bg-teal-100 flex items-center justify-center text-teal-600">
+                <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+              </div>
+              <h2 class="m-0">Finding accessible places</h2>
+            </div>
+            <p class="mb-8 hero-text">
+              Search for restaurants, shops, parks, healthcare facilities, and more based on your specific accessibility needs. Our database includes detailed information verified by our community.
+            </p>
+            <div class="inline-block bg-teal-600 text-white px-6 py-3 rounded-lg font-bold">
+              Available in the Athar mobile app
+            </div>
+          </div>
+          <div class="flex justify-center">
+            <div class="w-72 h-96 bg-white rounded-[40px] shadow-2xl border-8 border-gray-900 overflow-hidden flex items-center justify-center">
+              <div class="text-center p-8">
+                <div class="w-16 h-16 bg-teal-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg class="text-teal-600" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                </div>
+                <div class="font-bold text-xl">Search Places</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+          <div class="bg-white p-10 rounded-2xl shadow-sm">
+            <h3 class="mb-4">Detailed accessibility info</h3>
+            <p>Each location profile includes entrance accessibility, parking availability, restroom facilities, seating options, noise levels, and more.</p>
+          </div>
+          <div class="bg-white p-10 rounded-2xl shadow-sm">
+            <h3 class="mb-4">Community reviews</h3>
+            <p>Read experiences from other users with similar needs. Add your own reviews to help others in the community make informed decisions.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Connecting with Volunteers -->
+    <section class="py-32">
+      <div class="max-w-4xl mx-auto px-6 lg:px-8">
+        <div class="flex items-center gap-4 mb-12">
+          <div class="w-14 h-14 rounded-full bg-orange-100 flex items-center justify-center text-orange-600">
+            <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+          </div>
+          <h2 class="m-0">Connecting with volunteers</h2>
+        </div>
+        <p class="hero-text mb-16">
+          Sometimes you need more than information — you need a helping hand. Athar's volunteer network is here to provide companionship and support.
+        </p>
+
+        <div class="space-y-16">
+          <div class="flex gap-8 items-start">
+            <div class="w-12 h-12 bg-orange-600 text-white rounded-full flex items-center justify-center flex-shrink-0 font-bold">1</div>
+            <div>
+              <h3 class="mb-3">Request assistance</h3>
+              <p>Describe what kind of support you need — whether it's help navigating a new area, companionship for shopping, or assistance at a medical appointment.</p>
+            </div>
+          </div>
+          <div class="flex gap-8 items-start">
+            <div class="w-12 h-12 bg-orange-600 text-white rounded-full flex items-center justify-center flex-shrink-0 font-bold">2</div>
+            <div>
+              <h3 class="mb-3">Get matched</h3>
+              <p>Our system matches you with available volunteers in your area who have the right skills and availability. View their profiles and choose who you'd like to work with.</p>
+            </div>
+          </div>
+          <div class="flex gap-8 items-start">
+            <div class="w-12 h-12 bg-orange-600 text-white rounded-full flex items-center justify-center flex-shrink-0 font-bold">3</div>
+            <div>
+              <h3 class="mb-3">Connect and coordinate</h3>
+              <p>Message your volunteer through the app to finalize details. Meet at the agreed time and location safely.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t-2 border-gray-300 mt-32">
+    <div class="max-w-7xl mx-auto px-6 lg:px-8 py-16">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-12">
+        <div>
+          <h3 class="text-teal-700 mb-6 font-bold">About Athar</h3>
+          <p class="text-gray-900">Empowering people of determination through accessibility and community support.</p>
+        </div>
+        <div>
+          <h3 class="text-teal-700 mb-6 font-bold">Quick Links</h3>
+          <ul class="space-y-4 font-semibold">
+            <li><a href="home.html" class="hover:text-teal-600">Home</a></li>
+            <li><a href="about.html" class="hover:text-teal-600">About</a></li>
+            <li><a href="how-it-works.html" class="hover:text-teal-600">How It Works</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-teal-700 mb-6 font-bold">Resources</h3>
+          <ul class="space-y-4 font-semibold">
+            <li><a href="tutorials.html" class="hover:text-teal-600">Tutorials</a></li>
+            <li><a href="volunteer.html" class="hover:text-teal-600">Become a Volunteer</a></li>
+            <li><a href="contact.html" class="hover:text-teal-600">Contact Us</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-teal-700 mb-6 font-bold">Legal</h3>
+          <ul class="space-y-4 font-semibold">
+            <li><a href="#" class="hover:text-teal-600">Privacy Policy</a></li>
+            <li><a href="#" class="hover:text-teal-600">Terms of Service</a></li>
+            <li><a href="#" class="hover:text-teal-600">Accessibility Statement</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="mt-16 pt-8 border-t-2 border-gray-200 text-center font-bold">
+        © 2026 Athar. All rights reserved.
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

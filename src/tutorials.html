@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Athar - Tutorials and Guides</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #EAF2FB;
+      color: #1F3C5B;
+    }
+    
+    h1 {
+      font-size: 48px;
+      font-weight: 700;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+      color: #1F3C5B;
+    }
+    
+    h2 {
+      font-size: 34px;
+      font-weight: 600;
+      line-height: 1.2;
+      letter-spacing: -0.01em;
+      color: #1F3C5B;
+    }
+    
+    h3 {
+      font-size: 26px;
+      font-weight: 600;
+      line-height: 1.4;
+      color: #1F3C5B;
+    }
+    
+    h4 {
+      font-size: 20px;
+      font-weight: 700;
+      color: #1F3C5B;
+      margin-top: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    p, li {
+      font-size: 18px;
+      line-height: 1.75;
+    }
+    
+    .hero-text {
+      font-size: 20px;
+      line-height: 1.7;
+    }
+    
+    .tutorial-card {
+      background-color: white;
+      border-left: 6px solid #0D9488;
+      box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+      padding: 2.5rem;
+      margin-bottom: 2rem;
+      border-radius: 0.75rem;
+    }
+    
+    /* Print styles for full-page PDF export */
+    @media print {
+      body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        background-color: #EAF2FB !important;
+      }
+      
+      section {
+        page-break-inside: avoid;
+        break-inside: avoid;
+        background-color: #EAF2FB !important;
+      }
+      
+      .tutorial-card {
+        page-break-inside: avoid;
+        break-inside: avoid;
+        box-shadow: none;
+        border: 1px solid #e5e7eb;
+        border-left: 6px solid #0D9488;
+      }
+      
+      header, footer {
+        page-break-inside: avoid;
+      }
+      
+      * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        color-adjust: exact !important;
+      }
+    }
+  </style>
+</head>
+<body class="bg-[#EAF2FB]">
+  
+  <!-- Header -->
+  <header class="bg-white border-b-2 border-gray-300 shadow-sm">
+    <nav class="max-w-7xl mx-auto px-6 lg:px-8">
+      <div class="flex items-center justify-between h-28">
+        <a href="home.html" class="flex items-center ml-16">
+          <span class="text-4xl text-teal-600" style="font-weight: 700;">Athar</span>
+        </a>
+        <div class="flex items-center gap-10">
+          <a href="home.html" class="text-gray-900 hover:text-teal-600" style="font-weight: 600;">Home</a>
+          <a href="about.html" class="text-gray-900 hover:text-teal-600" style="font-weight: 600;">About</a>
+          <a href="how-it-works.html" class="text-gray-900 hover:text-teal-600" style="font-weight: 600;">How It Works</a>
+          <a href="tutorials.html" class="text-teal-700" style="font-weight: 700;">Tutorials</a>
+          <a href="volunteer.html" class="text-gray-900 hover:text-teal-600" style="font-weight: 600;">Volunteer</a>
+          <a href="contact.html" class="text-gray-900 hover:text-teal-600" style="font-weight: 600;">Contact</a>
+          <a href="#" class="px-6 py-3 bg-teal-600 text-white hover:bg-teal-700 transition-all shadow-md rounded-xl ml-4" style="font-weight: 600;">Get the App</a>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <!-- Hero Title -->
+    <section class="py-32 border-b-4 border-teal-600">
+      <div class="max-w-4xl mx-auto px-6 lg:px-8">
+        <div class="border-l-8 border-teal-700 pl-10">
+          <h1 class="mb-6">Tutorials and guides</h1>
+          <p class="hero-text text-gray-800">
+            Comprehensive resources to help you navigate accessibility, use the Athar platform effectively, and support others in your community with confidence and respect.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- People of Determination Section -->
+    <section class="py-32">
+      <div class="max-w-4xl mx-auto px-6 lg:px-8">
+        <div class="flex items-center gap-4 mb-16">
+          <div class="w-14 h-14 rounded-full bg-teal-100 flex items-center justify-center text-teal-600">
+            <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+          </div>
+          <h2 class="m-0">For people of determination</h2>
+        </div>
+
+        <div class="space-y-12">
+          <!-- Tutorial 1 -->
+          <div class="tutorial-card">
+            <h3 class="mb-4">Getting started with Athar</h3>
+            <p class="mb-8 font-semibold text-gray-600">A complete introduction to using the Athar platform, from creating your account to finding your first accessible location.</p>
+            <div class="space-y-4">
+              <p>Welcome to Athar! This comprehensive guide will walk you through everything you need to know to get started with our platform.</p>
+              <h4>Creating your account</h4>
+              <p>Download the Athar app from the App Store or Google Play. Tap "Sign Up" and enter your email address or connect with your preferred social account.</p>
+              <h4>Setting up your profile</h4>
+              <p>Complete your profile by adding information about your accessibility needs. This helps us personalize your experience and show you the most relevant information.</p>
+              <h4>Finding accessible locations</h4>
+              <p>Use the search function to find locations near you. Filter by accessibility features like wheelchair access, quiet spaces, or accessible parking.</p>
+            </div>
+          </div>
+
+          <!-- Tutorial 2 -->
+          <div class="tutorial-card">
+            <h3 class="mb-4">Understanding accessibility ratings</h3>
+            <p class="mb-8 font-semibold text-gray-600">Learn how to read and interpret accessibility information for different types of locations.</p>
+            <div class="space-y-4">
+              <p>Athar uses a comprehensive rating system to help you understand the accessibility features of any location.</p>
+              <h4>Rating categories</h4>
+              <p>We rate locations across multiple dimensions: mobility access, visual accessibility, hearing accessibility, and sensory-friendly features.</p>
+              <h4>Understanding the symbols</h4>
+              <p>Green checkmarks indicate fully accessible features. Orange symbols indicate partial accessibility. Red indicators show barriers or inaccessible features.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Volunteer Section -->
+    <section class="py-32 bg-white/30">
+      <div class="max-w-4xl mx-auto px-6 lg:px-8">
+        <div class="flex items-center gap-4 mb-16">
+          <div class="w-14 h-14 rounded-full bg-orange-100 flex items-center justify-center text-orange-600">
+            <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+          </div>
+          <h2 class="m-0">For volunteers and companions</h2>
+        </div>
+
+        <div class="space-y-12">
+          <!-- Volunteer Tutorial 1 -->
+          <div class="tutorial-card">
+            <h3 class="mb-4">Disability etiquette and communication</h3>
+            <p class="mb-8 font-semibold text-gray-600">Learn respectful, person-first communication and avoid common mistakes when offering assistance.</p>
+            <div class="space-y-4">
+              <p>Respectful communication is the foundation of good volunteer support. Here are key principles to follow.</p>
+              <h4>Person-first language</h4>
+              <p>Say "person with a disability" rather than "disabled person." Focus on the individual, not their disability. Avoid patronizing language.</p>
+              <h4>Always ask before helping</h4>
+              <p>Never assume someone needs assistance. Always ask "May I help you?" and wait for their response. If they decline, respect that decision.</p>
+            </div>
+          </div>
+
+          <!-- Volunteer Tutorial 2 -->
+          <div class="tutorial-card">
+            <h3 class="mb-4">Safety and boundaries</h3>
+            <p class="mb-8 font-semibold text-gray-600">Maintaining appropriate boundaries, personal safety, and professional conduct as a volunteer.</p>
+            <div class="space-y-4">
+              <p>Maintaining clear boundaries ensures safe, positive experiences for everyone involved.</p>
+              <h4>Professional boundaries</h4>
+              <p>Keep your relationship within the volunteer context. Don't ask for personal contact information outside the app. Focus on the person's needs.</p>
+              <h4>Personal safety</h4>
+              <p>Meet in public places. Share your location with a trusted contact using the in-app feature. Trust your instincts.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t-2 border-gray-300 mt-32">
+    <div class="max-w-7xl mx-auto px-6 lg:px-8 py-16">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-12 text-gray-900">
+        <div>
+          <h3 class="text-teal-700 mb-6 font-bold">About Athar</h3>
+          <p>Empowering people of determination through accessibility and community support.</p>
+        </div>
+        <div>
+          <h3 class="text-teal-700 mb-6 font-bold">Quick Links</h3>
+          <ul class="space-y-4 font-semibold">
+            <li><a href="home.html" class="hover:text-teal-600">Home</a></li>
+            <li><a href="about.html" class="hover:text-teal-600">About</a></li>
+            <li><a href="how-it-works.html" class="hover:text-teal-600">How It Works</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-teal-700 mb-6 font-bold">Resources</h3>
+          <ul class="space-y-4 font-semibold">
+            <li><a href="tutorials.html" class="hover:text-teal-600">Tutorials</a></li>
+            <li><a href="volunteer.html" class="hover:text-teal-600">Become a Volunteer</a></li>
+            <li><a href="contact.html" class="hover:text-teal-600">Contact Us</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-teal-700 mb-6 font-bold">Legal</h3>
+          <ul class="space-y-4 font-semibold">
+            <li><a href="#" class="hover:text-teal-600">Privacy Policy</a></li>
+            <li><a href="#" class="hover:text-teal-600">Terms of Service</a></li>
+            <li><a href="#" class="hover:text-teal-600">Accessibility Statement</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="mt-16 pt-8 border-t-2 border-gray-200 text-center font-bold">
+        © 2026 Athar. All rights reserved.
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Athar - Contact Us</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #EAF2FB;
+      color: #1F3C5B;
+    }
+    
+    h1 {
+      font-size: 48px;
+      font-weight: 700;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+      color: #1F3C5B;
+    }
+    
+    h2 {
+      font-size: 34px;
+      font-weight: 600;
+      line-height: 1.2;
+      letter-spacing: -0.01em;
+      color: #1F3C5B;
+    }
+    
+    h3 {
+      font-size: 26px;
+      font-weight: 600;
+      line-height: 1.4;
+      color: #1F3C5B;
+    }
+    
+    p, li {
+      font-size: 18px;
+      line-height: 1.75;
+    }
+    
+    .hero-text {
+      font-size: 20px;
+      line-height: 1.7;
+    }
+    
+    input, select, textarea {
+      width: 100%;
+      padding: 1rem 1.25rem;
+      border: 1px solid #d1d5db;
+      border-radius: 0.75rem;
+      background-color: white;
+      font-size: 16px;
+      margin-bottom: 1.5rem;
+    }
+    
+    label {
+      font-weight: 700;
+      font-size: 15px;
+      color: #1F3C5B;
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+    
+    /* Print styles for full-page PDF export */
+    @media print {
+      body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        background-color: #EAF2FB !important;
+      }
+      
+      section {
+        page-break-inside: avoid;
+        break-inside: avoid;
+        background-color: #EAF2FB !important;
+      }
+      
+      header, footer {
+        page-break-inside: avoid;
+      }
+      
+      form {
+        display: none;
+      }
+      
+      * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        color-adjust: exact !important;
+      }
+    }
+  </style>
+</head>
+<body class="bg-[#EAF2FB]">
+  
+  <!-- Header -->
+  <header class="bg-white border-b-2 border-gray-300 shadow-sm">
+    <nav class="max-w-7xl mx-auto px-6 lg:px-8">
+      <div class="flex items-center justify-between h-28">
+        <a href="home.html" class="flex items-center ml-16">
+          <span class="text-4xl text-teal-600" style="font-weight: 700;">Athar</span>
+        </a>
+        <div class="flex items-center gap-10">
+          <a href="home.html" class="text-gray-900 hover:text-teal-600" style="font-weight: 600;">Home</a>
+          <a href="about.html" class="text-gray-900 hover:text-teal-600" style="font-weight: 600;">About</a>
+          <a href="how-it-works.html" class="text-gray-900 hover:text-teal-600" style="font-weight: 600;">How It Works</a>
+          <a href="tutorials.html" class="text-gray-900 hover:text-teal-600" style="font-weight: 600;">Tutorials</a>
+          <a href="volunteer.html" class="text-gray-900 hover:text-teal-600" style="font-weight: 600;">Volunteer</a>
+          <a href="contact.html" class="text-teal-700" style="font-weight: 700;">Contact</a>
+          <a href="#" class="px-6 py-3 bg-teal-600 text-white hover:bg-teal-700 transition-all shadow-md rounded-xl ml-4" style="font-weight: 600;">Get the App</a>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <!-- Hero Title -->
+    <section class="py-32 border-b-4 border-teal-600">
+      <div class="max-w-4xl mx-auto px-6 lg:px-8">
+        <div class="border-l-8 border-teal-700 pl-10">
+          <h1 class="mb-6">Contact us</h1>
+          <p class="hero-text text-gray-800">
+            Have questions, feedback, or need support? We're here to help. Reach out to our team and we'll get back to you as soon as possible.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main Content -->
+    <section class="py-24">
+      <div class="max-w-7xl mx-auto px-6 lg:px-8">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-20">
+          
+          <!-- Left: Contact Info -->
+          <div>
+            <h2 class="mb-12">Get in touch</h2>
+            
+            <div class="space-y-12">
+              <div class="flex gap-6">
+                <div class="w-14 h-14 rounded-full bg-teal-100 flex items-center justify-center text-teal-600 flex-shrink-0">
+                  <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                </div>
+                <div>
+                  <h3 class="mb-2">Email</h3>
+                  <p class="text-gray-600 mb-1">For general inquiries and support</p>
+                  <a href="mailto:contact@athar.com" class="text-teal-700 font-bold text-xl hover:underline">contact@athar.com</a>
+                </div>
+              </div>
+              
+              <div class="flex gap-6">
+                <div class="w-14 h-14 rounded-full bg-teal-100 flex items-center justify-center text-teal-600 flex-shrink-0">
+                  <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+                </div>
+                <div>
+                  <h3 class="mb-2">Phone</h3>
+                  <p class="text-gray-600 mb-1">Monday to Friday, 9am to 5pm</p>
+                  <a href="tel:+97140000000" class="text-teal-700 font-bold text-xl hover:underline">+971 4 000 0000</a>
+                </div>
+              </div>
+              
+              <div class="flex gap-6">
+                <div class="w-14 h-14 rounded-full bg-teal-100 flex items-center justify-center text-teal-600 flex-shrink-0">
+                  <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                </div>
+                <div>
+                  <h3 class="mb-2">Address</h3>
+                  <p class="text-gray-800 text-lg leading-relaxed font-semibold">
+                    123 Accessibility Street<br>
+                    Innovation District<br>
+                    Dubai, UAE
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            <div class="mt-20 p-8 bg-teal-50 border-l-8 border-teal-600 rounded-r-2xl">
+              <h3 class="text-xl mb-4 font-bold">Response time</h3>
+              <p class="text-gray-800">We aim to respond to all inquiries within 24-48 hours during business days. For urgent matters, please call us directly.</p>
+            </div>
+          </div>
+          
+          <!-- Right: Form -->
+          <div class="bg-white p-12 rounded-2xl shadow-sm border border-gray-200 self-start">
+            <h2 class="mb-8">Send us a message</h2>
+            <form action="#">
+              <div>
+                <label>Your name *</label>
+                <input type="text" placeholder="Full name">
+              </div>
+              <div>
+                <label>Email address *</label>
+                <input type="email" placeholder="email@example.com">
+              </div>
+              <div>
+                <label>Subject *</label>
+                <select>
+                  <option>General Inquiry</option>
+                  <option>Technical Support</option>
+                  <option>Volunteer Questions</option>
+                  <option>Partnerships</option>
+                </select>
+              </div>
+              <div>
+                <label>Message *</label>
+                <textarea rows="6" placeholder="How can we help you?"></textarea>
+              </div>
+              <div class="pt-4">
+                <button type="submit" class="w-full bg-teal-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-teal-700 transition-all shadow-md">
+                  Send Message
+                </button>
+              </div>
+            </form>
+          </div>
+          
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t-2 border-gray-300 mt-32">
+    <div class="max-w-7xl mx-auto px-6 lg:px-8 py-16">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-12 text-gray-900">
+        <div>
+          <h3 class="text-teal-700 mb-6 font-bold">About Athar</h3>
+          <p>Empowering people of determination through accessibility and community support.</p>
+        </div>
+        <div>
+          <h3 class="text-teal-700 mb-6 font-bold">Quick Links</h3>
+          <ul class="space-y-4 font-semibold">
+            <li><a href="home.html" class="hover:text-teal-600">Home</a></li>
+            <li><a href="about.html" class="hover:text-teal-600">About</a></li>
+            <li><a href="how-it-works.html" class="hover:text-teal-600">How It Works</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-teal-700 mb-6 font-bold">Resources</h3>
+          <ul class="space-y-4 font-semibold">
+            <li><a href="tutorials.html" class="hover:text-teal-600">Tutorials</a></li>
+            <li><a href="volunteer.html" class="hover:text-teal-600">Become a Volunteer</a></li>
+            <li><a href="contact.html" class="hover:text-teal-600">Contact Us</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-teal-700 mb-6 font-bold">Legal</h3>
+          <ul class="space-y-4 font-semibold">
+            <li><a href="#" class="hover:text-teal-600">Privacy Policy</a></li>
+            <li><a href="#" class="hover:text-teal-600">Terms of Service</a></li>
+            <li><a href="#" class="hover:text-teal-600">Accessibility Statement</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="mt-16 pt-8 border-t-2 border-gray-200 text-center font-bold">
+        © 2026 Athar. All rights reserved.
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

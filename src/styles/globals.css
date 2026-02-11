@@ -1,0 +1,302 @@
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --font-size: 16px;
+  
+  /* Athar Complete Color Palette */
+  
+  /* Primary Colors */
+  --color-primary: #EAF2FB; /* Light Sky Blue - Backgrounds, calm & accessibility */
+  --color-primary-gradient: #D6E4F5; /* Soft Blue Gradient for depth */
+  
+  /* Navy Blue - Trust & professionalism */
+  --color-secondary: #1F3C5B;
+  --color-secondary-dark: #2C4F73; /* Deep Blue for contrast and structure */
+  
+  /* Warm Gold - Value, dignity, impact */
+  --color-accent: #C9A24D;
+  --color-accent-light: #D9B76D;
+  --color-accent-dark: #B38F3D;
+  
+  /* Background Colors */
+  --color-bg-primary: #EAF2FB; /* Light Sky Blue */
+  --color-bg-secondary: #D6E4F5; /* Soft Blue Gradient */
+  --color-bg-white: #FFFFFF;
+  
+  /* Text Colors - High contrast for readability */
+  --color-text-primary: #1F3C5B; /* Navy Blue for main text */
+  --color-text-secondary: #2C4F73; /* Deep Blue for secondary text */
+  --color-text-light: #5B7A99; /* Lighter blue for subtle text */
+  
+  /* Status Colors */
+  --color-success: #10B981; /* Accessible green */
+  --color-success-dark: #059669;
+  --color-warning: #D9A441; /* Warm gold tint */
+  --color-error: #EF4444; /* Warm red */
+  
+  /* Neutral Grays - Cool grays with blue tint */
+  --color-gray-50: #F8FAFB;
+  --color-gray-100: #F1F5F9;
+  --color-gray-200: #E2E8F0;
+  --color-gray-600: #475569;
+  --color-gray-700: #334155;
+  --color-gray-800: #1E293B;
+  
+  /* Standard theme variables mapped to Athar colors */
+  --background: #ffffff;
+  --foreground: #1F3C5B;
+  --card: #ffffff;
+  --card-foreground: #1F3C5B;
+  --popover: #ffffff;
+  --popover-foreground: #1F3C5B;
+  --primary: #1F3C5B;
+  --primary-foreground: #ffffff;
+  --secondary: #EAF2FB;
+  --secondary-foreground: #1F3C5B;
+  --muted: #D6E4F5;
+  --muted-foreground: #5B7A99;
+  --accent: #C9A24D;
+  --accent-foreground: #ffffff;
+  --destructive: #EF4444;
+  --destructive-foreground: #ffffff;
+  --border: #E2E8F0;
+  --input: transparent;
+  --input-background: #F1F5F9;
+  --switch-background: #E2E8F0;
+  --font-weight-medium: 500;
+  --font-weight-normal: 400;
+  --ring: #5B7A99;
+  --chart-1: #C9A24D;
+  --chart-2: #1F3C5B;
+  --chart-3: #10B981;
+  --chart-4: #D9B76D;
+  --chart-5: #2C4F73;
+  --radius: 0.625rem;
+  --sidebar: #F8FAFB;
+  --sidebar-foreground: #1F3C5B;
+  --sidebar-primary: #1F3C5B;
+  --sidebar-primary-foreground: #F8FAFB;
+  --sidebar-accent: #EAF2FB;
+  --sidebar-accent-foreground: #2C4F73;
+  --sidebar-border: #E2E8F0;
+  --sidebar-ring: #5B7A99;
+
+  /* Custom typography sizes for Athar */
+  --text-4xl: 48px;
+  --text-3xl: 42px;
+  --text-2xl: 34px;
+  --text-xl: 26px;
+  --text-lg: 22px;
+  --text-base: 18px;
+  --text-sm: 16px;
+  --text-xs: 14px;
+  
+  /* Enhanced line heights for better readability */
+  --leading-tight: 1.2;
+  --leading-normal: 1.6;
+  --leading-relaxed: 1.75;
+}
+
+.dark {
+  --background: #1E293B;
+  --foreground: #F8FAFB;
+  --card: #1E293B;
+  --card-foreground: #F8FAFB;
+  --popover: #1E293B;
+  --popover-foreground: #F8FAFB;
+  --primary: #EAF2FB;
+  --primary-foreground: #2C4F73;
+  --secondary: #2C4F73;
+  --secondary-foreground: #F8FAFB;
+  --muted: #2C4F73;
+  --muted-foreground: #5B7A99;
+  --accent: #2C4F73;
+  --accent-foreground: #F8FAFB;
+  --destructive: #EF4444;
+  --destructive-foreground: #F8FAFB;
+  --border: #2C4F73;
+  --input: #2C4F73;
+  --ring: #475569;
+  --font-weight-medium: 500;
+  --font-weight-normal: 400;
+  --chart-1: #C9A24D;
+  --chart-2: #EAF2FB;
+  --chart-3: #10B981;
+  --chart-4: #D9B76D;
+  --chart-5: #D6E4F5;
+  --sidebar: #2C4F73;
+  --sidebar-foreground: #F8FAFB;
+  --sidebar-primary: #EAF2FB;
+  --sidebar-primary-foreground: #F8FAFB;
+  --sidebar-accent: #2C4F73;
+  --sidebar-accent-foreground: #F8FAFB;
+  --sidebar-border: #2C4F73;
+  --sidebar-ring: #475569;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-input-background: var(--input-background);
+  --color-switch-background: var(--switch-background);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  
+  /* Athar Color Theme for Tailwind */
+  /* Map teal to Navy Blue */
+  --color-teal-50: #EAF2FB;
+  --color-teal-100: #D6E4F5;
+  --color-teal-200: #B3C9E8;
+  --color-teal-300: #8FADDB;
+  --color-teal-400: #6C92CE;
+  --color-teal-500: #1F3C5B;
+  --color-teal-600: #1F3C5B;
+  --color-teal-700: #2C4F73;
+  --color-teal-800: #1A2F45;
+  --color-teal-900: #0F1D2D;
+  --color-teal-950: #070F17;
+  
+  /* Map orange to Warm Gold */
+  --color-orange-50: #FDF8F0;
+  --color-orange-100: #F8ECD9;
+  --color-orange-200: #EDD8B3;
+  --color-orange-300: #E2C48C;
+  --color-orange-400: #D7B066;
+  --color-orange-500: #F97316;
+  --color-orange-600: #C9A24D;
+  --color-orange-700: #B38F3D;
+  --color-orange-800: #8C7030;
+  --color-orange-900: #665123;
+  --color-orange-950: #3F3216;
+  
+  /* Map lime to Success Green */
+  --color-lime-50: #F0FDF4;
+  --color-lime-100: #DCFCE7;
+  --color-lime-200: #BBF7D0;
+  --color-lime-300: #86EFAC;
+  --color-lime-400: #4ADE80;
+  --color-lime-500: #84CC16;
+  --color-lime-600: #10B981;
+  --color-lime-700: #059669;
+  --color-lime-800: #047857;
+  --color-lime-900: #065F46;
+  --color-lime-950: #064E3B;
+  
+  /* Override gray to use cool grays with blue tint */
+  --color-gray-50: #F8FAFB;
+  --color-gray-100: #F1F5F9;
+  --color-gray-200: #E2E8F0;
+  --color-gray-300: #CBD5E1;
+  --color-gray-400: #94A3B8;
+  --color-gray-500: #64748B;
+  --color-gray-600: #475569;
+  --color-gray-700: #334155;
+  --color-gray-800: #1E293B;
+  --color-gray-900: #1F3C5B;
+  --color-gray-950: #0F1A27;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/**
+ * Base typography. This is not applied to elements which have an ancestor with a Tailwind text class.
+ */
+@layer base {
+  :where(:not(:has([class*=' text-']), :not(:has([class^='text-'])))) {
+    h1 {
+      font-size: var(--text-4xl);
+      font-weight: 700;
+      line-height: var(--leading-tight);
+      letter-spacing: -0.02em;
+    }
+
+    h2 {
+      font-size: var(--text-2xl);
+      font-weight: 600;
+      line-height: var(--leading-tight);
+      letter-spacing: -0.01em;
+    }
+
+    h3 {
+      font-size: var(--text-xl);
+      font-weight: 600;
+      line-height: var(--leading-normal);
+    }
+
+    h4 {
+      font-size: var(--text-lg);
+      font-weight: 600;
+      line-height: var(--leading-normal);
+    }
+
+    p {
+      font-size: var(--text-base);
+      font-weight: var(--font-weight-normal);
+      line-height: var(--leading-relaxed);
+    }
+
+    label {
+      font-size: var(--text-base);
+      font-weight: 600;
+      line-height: var(--leading-normal);
+    }
+
+    button {
+      font-size: var(--text-base);
+      font-weight: 600;
+      line-height: var(--leading-normal);
+    }
+
+    input {
+      font-size: var(--text-base);
+      font-weight: var(--font-weight-normal);
+      line-height: var(--leading-normal);
+    }
+  }
+}
+
+html {
+  font-size: var(--font-size);
+}
