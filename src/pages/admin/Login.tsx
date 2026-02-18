@@ -29,7 +29,7 @@ export default function AdminLogin() {
         toast.success("Welcome back, Admin!");
         navigate(from, { replace: true });
       } else {
-        toast.error("Invalid credentials. Try admin@athar.com / admin123");
+        toast.error("Invalid admin credentials. Check ADMIN_EMAIL / ADMIN_PASSWORD in backend .env and run seeders.");
       }
     } catch (error) {
       toast.error("An error occurred during sign in.");

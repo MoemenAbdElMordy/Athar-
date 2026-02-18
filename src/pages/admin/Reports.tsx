@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { AdminLayout } from "../../components/admin/AdminLayout";
 import { 
   AlertTriangle, 
@@ -16,20 +16,44 @@ import { Input } from "../../components/ui/input";
 import { Badge } from "../../components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
 import { toast } from "sonner";
+import { api } from "../../utils/server-api";
 
-const initialReports = [
-  { id: 1, type: "Incorrect Info", place: "Mall of Egypt", description: "Elevator on floor 2 is actually out of service for 3 months now.", status: "Pending", user: "Ahmed Y.", date: "2024-02-09" },
-  { id: 2, type: "Inaccessible", place: "Nile Hospital", description: "Ramp at the emergency entrance is too steep and slippery.", status: "In Review", user: "Sara K.", date: "2024-02-08" },
-  { id: 3, type: "Spam", place: "Unknown Location", description: "Ads for another service inside the description.", status: "Resolved", user: "System", date: "2024-02-07" },
-  { id: 4, type: "Incorrect Info", place: "Public Library", description: "Wrong working hours, it closes at 5pm not 8pm.", status: "Pending", user: "Omar G.", date: "2024-02-06" },
-];
+function mapReport(flag: any) {
+  return {
+    id: flag.id,
+    type: flag.reason || "Report",
+    place: flag.flaggable?.name || flag.flaggable_type || "Unknown Location",
+    description: flag.details || flag.admin_note || "No description",
+    status: flag.status === 'resolved' ? 'Resolved' : flag.status === 'need_info' ? 'In Review' : flag.status === 'dismissed' ? 'Dismissed' : 'Pending',
+    user: flag.flagger?.name || `User #${flag.flagger_id ?? '-'}`,
+    date: flag.created_at || '',
+  };
+}
 
 export default function Reports() {
-  const [reports, setReports] = useState(initialReports);
+  const [reports, setReports] = useState<any[]>([]);
 
-  const resolveReport = (id: number) => {
-    setReports(reports.map(r => r.id === id ? { ...r, status: "Resolved" } : r));
-    toast.success("Report marked as resolved");
+  const fetchReports = async () => {
+    try {
+      const data = await api.reports.getAll();
+      setReports((data || []).map(mapReport));
+    } catch {
+      toast.error('Failed to load reports');
+    }
+  };
+
+  useEffect(() => {
+    fetchReports();
+  }, []);
+
+  const resolveReport = async (id: number) => {
+    try {
+      await api.reports.resolve(id);
+      setReports(reports.map(r => r.id === id ? { ...r, status: "Resolved" } : r));
+      toast.success("Report marked as resolved");
+    } catch {
+      toast.error('Failed to resolve report');
+    }
   };
 
   return (
@@ -98,14 +122,31 @@ export default function Reports() {
                         <Button 
                           variant="outline" 
                           className="w-full rounded-xl border-slate-200"
-                          onClick={() => {
-                            setReports(reports.map(r => r.id === report.id ? { ...r, status: "In Review" } : r));
-                            toast.info(`Information request sent to ${report.user}`);
+                          onClick={async () => {
+                            try {
+                              await api.reports.requestInfo(report.id, 'Please provide more details.');
+                              setReports(reports.map(r => r.id === report.id ? { ...r, status: "In Review" } : r));
+                              toast.info(`Information request sent to ${report.user}`);
+                            } catch {
+                              toast.error('Failed to request more information');
+                            }
                           }}
                         >
                           Request Info
                         </Button>
-                        <Button variant="ghost" className="w-full rounded-xl text-red-500 hover:bg-red-50">
+                        <Button
+                          variant="ghost"
+                          className="w-full rounded-xl text-red-500 hover:bg-red-50"
+                          onClick={async () => {
+                            try {
+                              await api.reports.dismiss(report.id, 'Dismissed by admin');
+                              setReports(reports.map(r => r.id === report.id ? { ...r, status: "Dismissed" } : r));
+                              toast.success('Report dismissed');
+                            } catch {
+                              toast.error('Failed to dismiss report');
+                            }
+                          }}
+                        >
                           Dismiss Report
                         </Button>
                       </>

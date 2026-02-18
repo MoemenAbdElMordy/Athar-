@@ -9,8 +9,6 @@ import {
   CartesianGrid, 
   Tooltip, 
   ResponsiveContainer,
-  LineChart,
-  Line,
   AreaChart,
   Area
 } from "recharts";
@@ -35,49 +33,134 @@ const initialKpiData = [
   { title: "Reports", value: "12", icon: AlertTriangle, color: "bg-red-500", change: "Stable" },
 ];
 
-const chartData = [
-  { name: "Mon", requests: 12, places: 4 },
-  { name: "Tue", requests: 19, places: 7 },
-  { name: "Wed", requests: 15, places: 5 },
-  { name: "Thu", requests: 22, places: 9 },
-  { name: "Fri", requests: 30, places: 12 },
-  { name: "Sat", requests: 25, places: 15 },
-  { name: "Sun", requests: 18, places: 8 },
-];
+function buildEmptyWeeklySeries() {
+  const formatter = new Intl.DateTimeFormat("en", { weekday: "short" });
+  return Array.from({ length: 7 }, (_, idx) => {
+    const day = new Date();
+    day.setHours(0, 0, 0, 0);
+    day.setDate(day.getDate() - (6 - idx));
+    return {
+      name: formatter.format(day),
+      key: day.toISOString().slice(0, 10),
+      requests: 0,
+      places: 0,
+    };
+  });
+}
 
-const recentActivity = [
-  { id: 1, type: "Place Approved", target: "Starbucks Mall of Arabia", user: "John Doe", time: "2 hours ago", status: "Success" },
-  { id: 2, type: "New Report", target: "Public Park Giza", user: "Sara Ahmed", time: "4 hours ago", status: "Warning" },
-  { id: 3, type: "Request Resolved", target: "Wheelchair Access Hub", user: "Admin", time: "Yesterday", status: "Success" },
-  { id: 4, type: "Place Submission", target: "Metro Station Exit 4", user: "Volunteer #23", time: "Yesterday", status: "Info" },
-  { id: 5, type: "Data Update", target: "City Library", user: "System", time: "2 days ago", status: "Info" },
-];
+function toTimeAgo(value?: string) {
+  if (!value) return "Unknown";
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "Unknown";
+
+  const diffMs = Date.now() - date.getTime();
+  const diffMinutes = Math.floor(diffMs / 60000);
+  if (diffMinutes < 1) return "Just now";
+  if (diffMinutes < 60) return `${diffMinutes} min ago`;
+
+  const diffHours = Math.floor(diffMinutes / 60);
+  if (diffHours < 24) return `${diffHours}h ago`;
+
+  const diffDays = Math.floor(diffHours / 24);
+  if (diffDays < 7) return `${diffDays}d ago`;
+
+  return date.toLocaleDateString();
+}
 
 export default function Dashboard() {
   const navigate = useNavigate();
   const [kpiData, setKpiData] = useState(initialKpiData);
+  const [chartData, setChartData] = useState(buildEmptyWeeklySeries());
+  const [recentActivity, setRecentActivity] = useState<any[]>([]);
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
-    const fetchKpis = async () => {
+    const fetchDashboard = async () => {
       try {
-        const [places, requests] = await Promise.all([
+        const [counts, places, requests, submissions, notifications] = await Promise.all([
+          api.dashboard.getSummary(),
           api.places.getAll(),
-          api.requests.getAll()
+          api.requests.getAll(),
+          api.placeSubmissions.getAll(),
+          api.notifications.getAll(),
         ]);
         
         setKpiData(prev => prev.map(item => {
-          if (item.title === "Total Places") return { ...item, value: places.length.toLocaleString() };
-          if (item.title === "Open Requests") return { ...item, value: requests.filter((r: any) => r.status === 'Pending').length.toString() };
+          if (item.title === "Total Places") return { ...item, value: Number(counts.locations || 0).toLocaleString() };
+          if (item.title === "Pending Reviews") return { ...item, value: String(counts.pending_place_submissions || 0) };
+          if (item.title === "Open Requests") return { ...item, value: String(counts.pending_help_requests || 0) };
+          if (item.title === "Reports") return { ...item, value: String(counts.open_flags || 0) };
           return item;
         }));
+
+        const weekly = buildEmptyWeeklySeries();
+        const indexByDate = weekly.reduce((acc, item, idx) => {
+          acc[item.key] = idx;
+          return acc;
+        }, {} as Record<string, number>);
+
+        places.forEach((place: any) => {
+          const sourceDate = place.updatedAt || place.raw?.created_at;
+          if (!sourceDate) return;
+          const dayKey = new Date(sourceDate).toISOString().slice(0, 10);
+          const idx = indexByDate[dayKey];
+          if (typeof idx === "number") weekly[idx].places += 1;
+        });
+
+        requests.forEach((request: any) => {
+          const sourceDate = request.time || request.raw?.created_at;
+          if (!sourceDate) return;
+          const dayKey = new Date(sourceDate).toISOString().slice(0, 10);
+          const idx = indexByDate[dayKey];
+          if (typeof idx === "number") weekly[idx].requests += 1;
+        });
+
+        setChartData(weekly);
+
+        const activityFromSubmissions = submissions.map((item: any) => ({
+          id: `sub-${item.id}`,
+          type: "Place Submission",
+          target: item.name || "Submitted place",
+          user: item.submitted_by ? `User #${item.submitted_by}` : "Volunteer",
+          timeValue: item.updated_at || item.created_at,
+          status: item.status === "approved" ? "Success" : item.status === "rejected" ? "Warning" : "Info",
+        }));
+
+        const activityFromRequests = requests.map((item: any) => ({
+          id: `req-${item.id}`,
+          type: "Help Request",
+          target: item.location || "Unknown location",
+          user: item.requester || "User",
+          timeValue: item.time || item.raw?.created_at,
+          status: item.status === "Resolved" ? "Success" : item.status === "In Progress" ? "Info" : "Warning",
+        }));
+
+        const activityFromNotifications = notifications.map((item: any) => ({
+          id: `notif-${item.id}`,
+          type: "Notification",
+          target: item.title || item.message || "System notification",
+          user: "System",
+          timeValue: item.created_at,
+          status: item.is_read ? "Info" : "Success",
+        }));
+
+        const merged = [...activityFromSubmissions, ...activityFromRequests, ...activityFromNotifications]
+          .sort((a, b) => new Date(b.timeValue || 0).getTime() - new Date(a.timeValue || 0).getTime())
+          .slice(0, 8)
+          .map((item) => ({
+            ...item,
+            time: toTimeAgo(item.timeValue),
+          }));
+
+        setRecentActivity(merged);
       } catch (error) {
         console.error("Failed to load dashboard data", error);
       }
     };
     
-    fetchKpis();
+    fetchDashboard();
   }, []);
 
   return (
@@ -183,7 +266,7 @@ export default function Dashboard() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-50">
-                  {recentActivity.map((activity) => (
+                  {recentActivity.length > 0 ? recentActivity.map((activity) => (
                     <tr key={activity.id} className="group hover:bg-slate-50 transition-colors">
                       <td className="py-4 text-sm font-medium text-[#1F3C5B]">{activity.type}</td>
                       <td className="py-4 text-sm text-slate-600">{activity.target}</td>
@@ -199,7 +282,11 @@ export default function Dashboard() {
                         </Badge>
                       </td>
                     </tr>
-                  ))}
+                  )) : (
+                    <tr>
+                      <td colSpan={5} className="py-8 text-center text-sm text-slate-500">No recent activity found.</td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { AdminLayout } from "../../components/admin/AdminLayout";
 import { 
   Bell, 
@@ -11,7 +11,8 @@ import {
   Clock,
   MoreVertical,
   Check,
-  Trash2
+  Trash2,
+  Loader2
 } from "lucide-react";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
@@ -23,12 +24,13 @@ import {
   DropdownMenuItem, 
   DropdownMenuTrigger 
 } from "../../components/ui/dropdown-menu";
-import { toast } from "sonner@2.0.3";
+import { toast } from "sonner";
+import { api } from "../../utils/server-api";
 
 type NotificationType = 'place' | 'request' | 'report' | 'system';
 
 interface Notification {
-  id: number;
+  id: number | string;
   type: NotificationType;
   title: string;
   description: string;
@@ -37,81 +39,74 @@ interface Notification {
   priority: 'low' | 'medium' | 'high';
 }
 
-const initialNotifications: Notification[] = [
-  { 
-    id: 1, 
-    type: 'place', 
-    title: "New Place Submission", 
-    description: "User 'Ahmed' submitted a new place: Giza Public Library for review.", 
-    time: "5 mins ago", 
-    status: 'unread',
-    priority: 'medium'
-  },
-  { 
-    id: 2, 
-    type: 'request', 
-    title: "Urgent Help Request", 
-    description: "A user requires wheelchair assistance at Cairo Station, Platform 3.", 
-    time: "12 mins ago", 
-    status: 'unread',
-    priority: 'high'
-  },
-  { 
-    id: 3, 
-    type: 'report', 
-    title: "Report Flagged", 
-    description: "Incorrect accessibility info reported for City Mall food court.", 
-    time: "1 hour ago", 
-    status: 'unread',
-    priority: 'medium'
-  },
-  { 
-    id: 4, 
-    type: 'system', 
-    title: "System Update", 
-    description: "Database maintenance completed successfully. All services are operational.", 
-    time: "3 hours ago", 
-    status: 'read',
-    priority: 'low'
-  },
-  { 
-    id: 5, 
-    type: 'place', 
-    title: "New Place Submission", 
-    description: "User 'Sara' added 'Nile View Cafe' to the community map.", 
-    time: "5 hours ago", 
-    status: 'read',
-    priority: 'medium'
-  },
-  { 
-    id: 6, 
-    type: 'request', 
-    title: "Help Request", 
-    description: "Information requested about ramp availability at Al-Azhar Park.", 
-    time: "Yesterday", 
-    status: 'read',
-    priority: 'low'
-  },
-];
+function mapNotification(item: any): Notification {
+  const source = String(item?.data?.source || item?.type || '').toLowerCase();
+  const type: NotificationType = source.includes('flag')
+    ? 'report'
+    : source.includes('help')
+      ? 'request'
+      : source.includes('place') || source.includes('location')
+        ? 'place'
+        : 'system';
+
+  const priority: Notification['priority'] = type === 'request' ? 'high' : type === 'report' ? 'medium' : 'low';
+
+  return {
+    id: item.id,
+    type,
+    title: item?.data?.title || item?.title || 'Notification',
+    description: item?.data?.message || item?.data?.body || item?.message || 'No details',
+    time: item.created_at || '',
+    status: item.is_read ? 'read' : 'unread',
+    priority,
+  };
+}
 
 export default function Notifications() {
-  const [notifications, setNotifications] = useState<Notification[]>(initialNotifications);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
   const [filter, setFilter] = useState<NotificationType | 'all'>('all');
   const [searchQuery, setSearchQuery] = useState("");
+  const [loading, setLoading] = useState(true);
 
-  const markAsRead = (id: number) => {
-    setNotifications(notifications.map(n => n.id === id ? { ...n, status: 'read' as const } : n));
-    toast.success("Notification marked as read");
+  const fetchNotifications = async () => {
+    try {
+      setLoading(true);
+      const data = await api.notifications.getAll();
+      setNotifications((data || []).map(mapNotification));
+    } catch (error) {
+      toast.error('Failed to load notifications');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const deleteNotification = (id: number) => {
+  useEffect(() => {
+    fetchNotifications();
+  }, []);
+
+  const markAsRead = async (id: number | string) => {
+    try {
+      await api.notifications.markRead(id);
+      setNotifications(notifications.map(n => n.id === id ? { ...n, status: 'read' as const } : n));
+      toast.success("Notification marked as read");
+    } catch {
+      toast.error('Failed to update notification');
+    }
+  };
+
+  const deleteNotification = (id: number | string) => {
     setNotifications(notifications.filter(n => n.id !== id));
     toast.success("Notification deleted");
   };
 
-  const markAllAsRead = () => {
-    setNotifications(notifications.map(n => ({ ...n, status: 'read' as const })));
-    toast.success("All notifications marked as read");
+  const markAllAsRead = async () => {
+    try {
+      await api.notifications.markAllRead();
+      setNotifications(notifications.map(n => ({ ...n, status: 'read' as const })));
+      toast.success("All notifications marked as read");
+    } catch {
+      toast.error('Failed to mark all notifications as read');
+    }
   };
 
   const filteredNotifications = notifications.filter(n => {
@@ -170,7 +165,11 @@ export default function Notifications() {
         </div>
 
         <div className="space-y-3">
-          {filteredNotifications.length > 0 ? (
+          {loading ? (
+            <div className="text-center py-20 bg-white rounded-3xl border border-dashed border-slate-200">
+              <Loader2 className="w-8 h-8 mx-auto animate-spin text-[#1F3C5B]" />
+            </div>
+          ) : filteredNotifications.length > 0 ? (
             filteredNotifications.map((notif) => (
               <Card 
                 key={notif.id} 

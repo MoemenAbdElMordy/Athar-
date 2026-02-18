@@ -1,17 +1,18 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { api } from '../../utils/server-api';
 
 interface User {
-  id: string;
+  id: string | number;
   email: string;
   name: string;
-  role: 'admin' | 'moderator';
+  role: string;
 }
 
 interface AuthContextType {
   user: User | null;
   login: (email: string, password: string) => Promise<boolean>;
-  logout: () => void;
+  logout: () => Promise<void>;
   isLoading: boolean;
 }
 
@@ -23,34 +24,52 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Mock check for existing session
-    const storedUser = localStorage.getItem('athar_admin_user');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-    setIsLoading(false);
+    const checkSession = async () => {
+      try {
+        const me = await api.auth.me();
+        const currentUser: User = {
+          id: me.id,
+          email: me.email,
+          name: me.name || me.full_name || 'Admin',
+          role: me.role || 'admin',
+        };
+        setUser(currentUser);
+        localStorage.setItem('athar_admin_user', JSON.stringify(currentUser));
+      } catch {
+        setUser(null);
+        localStorage.removeItem('athar_admin_user');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkSession();
   }, []);
 
   const login = async (email: string, password: string) => {
-    // Mock authentication
-    // In a real app, this would call your MySQL/Supabase backend
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    if (email === 'admin@athar.com' && password === 'admin123') {
-      const mockUser: User = {
-        id: '1',
-        email: 'admin@athar.com',
-        name: 'Athar Admin',
-        role: 'admin'
+    try {
+      await api.auth.login(email, password);
+      const me = await api.auth.me();
+      const currentUser: User = {
+        id: me.id,
+        email: me.email,
+        name: me.name || me.full_name || 'Admin',
+        role: me.role || 'admin',
       };
-      setUser(mockUser);
-      localStorage.setItem('athar_admin_user', JSON.stringify(mockUser));
+      setUser(currentUser);
+      localStorage.setItem('athar_admin_user', JSON.stringify(currentUser));
       return true;
+    } catch {
+      return false;
     }
-    return false;
   };
 
-  const logout = () => {
+  const logout = async () => {
+    try {
+      await api.auth.logout();
+    } catch {
+      // ignore logout network failure and clear local session anyway
+    }
     setUser(null);
     localStorage.removeItem('athar_admin_user');
     navigate('/admin/login');

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { AdminLayout } from "../../components/admin/AdminLayout";
 import { 
   Plus, 
@@ -31,17 +31,24 @@ import {
 } from "../../components/ui/dialog";
 import { Label } from "../../components/ui/label";
 import { Textarea } from "../../components/ui/textarea";
-import { toast } from "sonner@2.0.3";
+import { toast } from "sonner";
+import { api } from "../../utils/server-api";
 
-const initialTutorials = [
-  { id: 1, title: "How to use Athar App", author: "Admin", status: "Published", date: "2024-01-15", views: "1.2k", description: "This comprehensive guide covers all the basic features of the Athar accessibility app, from searching for locations to reading accessibility reports." },
-  { id: 2, title: "Accessibility Mapping 101", author: "Sarah L.", status: "Draft", date: "2024-02-01", views: "0", description: "Learn how to contribute to our community by mapping new locations and providing accurate accessibility data for others." },
-  { id: 3, title: "Reporting Broken Facilities", author: "Admin", status: "Published", date: "2024-01-20", views: "850", description: "A quick guide on how to report issues with facilities such as broken elevators, ramps, or blocked accessible pathways." },
-  { id: 4, title: "Volunteering with Athar", author: "Omar H.", status: "Draft", date: "2024-02-05", views: "0", description: "Discover the various ways you can help the Athar mission, from digital mapping to on-the-ground facility auditing." },
-];
+function mapTutorial(item: any) {
+  return {
+    id: item.id,
+    title: item.title,
+    author: "Admin",
+    status: item.is_published ? "Published" : "Draft",
+    date: item.created_at ? String(item.created_at).slice(0, 10) : new Date().toISOString().slice(0, 10),
+    views: "0",
+    description: item.description || "",
+    raw: item,
+  };
+}
 
 export default function TutorialsAdmin() {
-  const [tutorials, setTutorials] = useState(initialTutorials);
+  const [tutorials, setTutorials] = useState<any[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [showFullContent, setShowFullContent] = useState(false);
@@ -55,6 +62,19 @@ export default function TutorialsAdmin() {
     status: "Draft",
     description: ""
   });
+
+  const fetchTutorials = async () => {
+    try {
+      const data = await api.tutorials.getAll();
+      setTutorials((data || []).map(mapTutorial));
+    } catch {
+      toast.error("Failed to load tutorials");
+    }
+  };
+
+  useEffect(() => {
+    fetchTutorials();
+  }, []);
 
   const handleOpenCreate = () => {
     setIsEditing(false);
@@ -75,39 +95,49 @@ export default function TutorialsAdmin() {
     setIsDialogOpen(true);
   };
 
-  const handleSaveTutorial = () => {
+  const handleSaveTutorial = async () => {
     if (!formData.title.trim()) {
       toast.error("Please enter a title");
       return;
     }
 
-    if (isEditing && currentEditId !== null) {
-      setTutorials(tutorials.map(t => 
-        t.id === currentEditId 
-          ? { ...t, title: formData.title, author: formData.author, status: formData.status, description: formData.description }
-          : t
-      ));
-      toast.success("Tutorial updated successfully");
-    } else {
-      const newTutorial = {
-        id: Math.max(0, ...tutorials.map(t => t.id)) + 1,
-        title: formData.title,
-        author: formData.author,
-        status: formData.status,
-        description: formData.description,
-        date: new Date().toISOString().split('T')[0],
-        views: "0"
-      };
-      setTutorials([newTutorial, ...tutorials]);
-      toast.success("Tutorial created successfully");
-    }
+    try {
+      if (isEditing && currentEditId !== null) {
+        const updated = await api.tutorials.update(currentEditId, {
+          title: formData.title,
+          description: formData.description,
+          is_published: formData.status === "Published",
+        });
+        const mapped = mapTutorial(updated);
+        setTutorials(tutorials.map((t) => (t.id === currentEditId ? mapped : t)));
+        toast.success("Tutorial updated successfully");
+      } else {
+        const created = await api.tutorials.create({
+          title: formData.title,
+          description: formData.description,
+          video_url: null,
+          thumbnail_url: null,
+          category: null,
+          is_published: formData.status === "Published",
+        });
+        setTutorials([mapTutorial(created), ...tutorials]);
+        toast.success("Tutorial created successfully");
+      }
 
-    setIsDialogOpen(false);
+      setIsDialogOpen(false);
+    } catch {
+      toast.error("Failed to save tutorial");
+    }
   };
 
-  const deleteTutorial = (id: number) => {
-    setTutorials(tutorials.filter(t => t.id !== id));
-    toast.success("Tutorial deleted");
+  const deleteTutorial = async (id: number) => {
+    try {
+      await api.tutorials.delete(id);
+      setTutorials(tutorials.filter(t => t.id !== id));
+      toast.success("Tutorial deleted");
+    } catch {
+      toast.error("Failed to delete tutorial");
+    }
   };
 
   const handleViewPreview = (tutorial: any) => {

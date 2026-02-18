@@ -18,13 +18,6 @@ import { Card, CardContent } from "../../components/ui/card";
 import { toast } from "sonner";
 import { api } from "../../utils/server-api";
 
-const initialRequests = [
-  { id: "1", requester: "Karim Z.", location: "Metro Station Exit 3", notes: "Wheelchair ramp is broken and currently blocked by construction material. Need assistance for exit.", status: "Pending", time: "15 mins ago" },
-  { id: "2", requester: "Noura A.", location: "Cairo University Main Gate", notes: "Security guard says there is a lift but it requires a key. I've been waiting for 20 mins.", status: "In Progress", time: "45 mins ago" },
-  { id: "3", requester: "Sameh M.", location: "Dokki Public Library", notes: "The accessible toilet is locked with no sign of who has the key.", status: "Resolved", time: "2 hours ago" },
-  { id: "4", requester: "Laila H.", location: "Al-Azhar Park North Entrance", notes: "Path is too steep for manual wheelchair without help.", status: "Pending", time: "3 hours ago" },
-];
-
 export default function Requests() {
   const [view, setView] = useState<'grid' | 'table'>('grid');
   const [requests, setRequests] = useState<any[]>([]);
@@ -35,17 +28,7 @@ export default function Requests() {
     try {
       setLoading(true);
       const data = await api.requests.getAll();
-      
-      // Seed if empty
-      if (data.length === 0) {
-        for (const r of initialRequests) {
-          await api.requests.create(r);
-        }
-        const seededData = await api.requests.getAll();
-        setRequests(seededData);
-      } else {
-        setRequests(data);
-      }
+      setRequests(data);
     } catch (error) {
       console.error("Failed to fetch requests:", error);
       toast.error("Failed to load requests from server");

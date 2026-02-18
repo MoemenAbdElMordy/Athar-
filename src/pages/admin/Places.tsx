@@ -39,14 +39,6 @@ import { Textarea } from "../../components/ui/textarea";
 import { toast } from "sonner";
 import { api } from "../../utils/server-api";
 
-const initialPlaces = [
-  { id: "1", name: "City Center Mall", category: "Shopping", city: "Cairo", tags: ["Elevator", "Ramp"], status: "Approved", updatedAt: "2024-02-10" },
-  { id: "2", name: "National Museum", category: "Tourism", city: "Giza", tags: ["Audio Guide", "Parking"], status: "Pending", updatedAt: "2024-02-09" },
-  { id: "3", name: "Healthy Way Clinic", category: "Healthcare", city: "Alexandria", tags: ["Accessible Toilet"], status: "Approved", updatedAt: "2024-02-08" },
-  { id: "4", name: "Public Library", category: "Education", city: "Cairo", tags: ["Wide Doors"], status: "Rejected", updatedAt: "2024-02-07" },
-  { id: "5", name: "Central Metro Station", category: "Transport", city: "Cairo", tags: ["Lift", "Braille"], status: "Pending", updatedAt: "2024-02-06" },
-];
-
 export default function Places() {
   const [places, setPlaces] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -65,17 +57,7 @@ export default function Places() {
     try {
       setLoading(true);
       const data = await api.places.getAll();
-      
-      // Seed if empty
-      if (data.length === 0) {
-        for (const p of initialPlaces) {
-          await api.places.create(p);
-        }
-        const seededData = await api.places.getAll();
-        setPlaces(seededData);
-      } else {
-        setPlaces(data);
-      }
+      setPlaces(data);
     } catch (error) {
       console.error("Failed to fetch places:", error);
       toast.error("Failed to load places from server");
@@ -184,7 +166,7 @@ export default function Places() {
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="category">Category *</Label>
-                      <Select onValueChange={(val) => setNewPlace({...newPlace, category: val})}>
+                      <Select onValueChange={(val: string) => setNewPlace({...newPlace, category: val})}>
                         <SelectTrigger className="rounded-xl">
                           <SelectValue placeholder="Select category" />
                         </SelectTrigger>
