@@ -8,6 +8,8 @@ import {
   Calendar, 
   CheckCircle, 
   XCircle,
+  ChevronLeft,
+  ChevronRight,
   MessageSquare,
   ArrowRight
 } from "lucide-react";
@@ -32,6 +34,7 @@ function mapReport(flag: any) {
 
 export default function Reports() {
   const [reports, setReports] = useState<any[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const fetchReports = async () => {
     try {
@@ -45,6 +48,16 @@ export default function Reports() {
   useEffect(() => {
     fetchReports();
   }, []);
+
+  const pageSize = 10;
+  const totalPages = Math.max(1, Math.ceil(reports.length / pageSize));
+  const startIndex = (currentPage - 1) * pageSize;
+  const endIndex = startIndex + pageSize;
+  const pagedReports = reports.slice(startIndex, endIndex);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [reports.length]);
 
   const resolveReport = async (id: number) => {
     try {
@@ -71,7 +84,7 @@ export default function Reports() {
         </div>
 
         <div className="grid grid-cols-1 gap-6">
-          {reports.map((report) => (
+          {pagedReports.map((report) => (
             <Card key={report.id} className="border-none shadow-sm bg-white overflow-hidden border border-slate-100">
               <CardHeader className="flex flex-row items-center justify-between pb-2 bg-slate-50/50">
                 <div className="flex items-center gap-3">
@@ -163,6 +176,43 @@ export default function Reports() {
             </Card>
           ))}
         </div>
+
+        {reports.length > 0 && (
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-2">
+            <div className="text-sm text-slate-500">
+              Showing <span className="font-medium text-slate-700">{Math.min(startIndex + 1, reports.length)}</span> -{' '}
+              <span className="font-medium text-slate-700">{Math.min(endIndex, reports.length)}</span> of{' '}
+              <span className="font-medium text-slate-700">{reports.length}</span>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                className="rounded-xl border-slate-200 text-slate-600 gap-2"
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                disabled={currentPage <= 1}
+              >
+                <ChevronLeft size={18} />
+                <span>Previous</span>
+              </Button>
+
+              <div className="text-sm text-slate-500 min-w-[110px] text-center">
+                Page <span className="font-medium text-slate-700">{currentPage}</span> /{' '}
+                <span className="font-medium text-slate-700">{totalPages}</span>
+              </div>
+
+              <Button
+                variant="outline"
+                className="rounded-xl border-slate-200 text-slate-600 gap-2"
+                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                disabled={currentPage >= totalPages}
+              >
+                <span>Next</span>
+                <ChevronRight size={18} />
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
     </AdminLayout>
   );

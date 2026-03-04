@@ -7,6 +7,7 @@ import {
   BookOpen, 
   AlertTriangle, 
   Settings, 
+  Users,
   LogOut,
   ChevronLeft,
   ChevronRight,
@@ -21,6 +22,7 @@ const sidebarLinks = [
   { name: "Help Requests", path: "/admin/requests", icon: HelpCircle },
   { name: "Tutorials", path: "/admin/tutorials", icon: BookOpen },
   { name: "Reports", path: "/admin/reports", icon: AlertTriangle },
+  { name: "Accounts", path: "/admin/accounts", icon: Users },
   { name: "Settings", path: "/admin/settings", icon: Settings },
 ];
 

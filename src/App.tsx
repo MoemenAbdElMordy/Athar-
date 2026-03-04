@@ -22,6 +22,7 @@ import TutorialsAdmin from "./pages/admin/Tutorials";
 import Reports from "./pages/admin/Reports";
 import Settings from "./pages/admin/Settings";
 import Notifications from "./pages/admin/Notifications";
+import Accounts from "./pages/admin/Accounts";
 
 // Auth
 import { AuthProvider } from "./components/admin/AuthContext";
@@ -80,6 +81,11 @@ function AppContent() {
           <Route path="/admin/notifications" element={
             <ProtectedRoute>
               <Notifications />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/accounts" element={
+            <ProtectedRoute>
+              <Accounts />
             </ProtectedRoute>
           } />
         </Routes>

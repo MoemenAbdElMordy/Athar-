@@ -37,6 +37,14 @@ function asObject<T = AnyRecord>(value: any): T {
   return {} as T;
 }
 
+function buildQuery(params: Record<string, any>): string {
+  const entries = Object.entries(params)
+    .filter(([, v]) => v !== undefined && v !== null)
+    .map(([k, v]) => [k, String(v)]);
+  const query = new URLSearchParams(entries as any).toString();
+  return query ? `?${query}` : '';
+}
+
 function toUiRequestStatus(status?: string): string {
   if (status === 'in_progress') return 'In Progress';
   if (status === 'resolved') return 'Resolved';
@@ -106,6 +114,34 @@ export const api = {
     },
   },
 
+  accounts: {
+    getAll: async () => {
+      const data = await request('/admin/accounts');
+      return asObject(data);
+    },
+    create: (payload: {
+      name: string;
+      full_name?: string;
+      email: string;
+      phone?: string;
+      password: string;
+      role: 'user' | 'volunteer';
+      is_active?: boolean;
+    }) => request('/admin/accounts', { method: 'POST', body: JSON.stringify(payload) }),
+    update: (id: string | number, payload: {
+      name?: string;
+      full_name?: string;
+      email?: string;
+      phone?: string;
+      password?: string;
+      role?: 'user' | 'volunteer';
+      is_active?: boolean;
+    }) => request(`/admin/accounts/${id}`, { method: 'PUT', body: JSON.stringify(payload) }),
+    delete: (id: string | number) => request(`/admin/accounts/${id}`, { method: 'DELETE' }),
+    approveVolunteer: (id: string | number) => request(`/admin/accounts/${id}/volunteer/approve`, { method: 'POST' }),
+    rejectVolunteer: (id: string | number) => request(`/admin/accounts/${id}/volunteer/reject`, { method: 'POST' }),
+  },
+
   governments: {
     getAll: async () => {
       const data = await request('/admin/governments');
@@ -134,9 +170,35 @@ export const api = {
   },
 
   places: {
-    getAll: async () => {
-      const data = await request('/admin/locations?search=&government_id=&category_id=');
-      return asArray(data).map(mapLocationToUi);
+    getAll: async (params?: { search?: string; government_id?: string | number; category_id?: string | number; per_page?: number }) => {
+      const perPage = Math.min(Number(params?.per_page ?? 200) || 200, 200);
+      const search = params?.search ?? '';
+      const governmentId = params?.government_id ?? '';
+      const categoryId = params?.category_id ?? '';
+
+      const all: AnyRecord[] = [];
+      let page = 1;
+      let lastPage = 1;
+
+      while (page <= lastPage) {
+        const query = buildQuery({
+          search,
+          government_id: governmentId,
+          category_id: categoryId,
+          page,
+          per_page: perPage,
+        });
+        const data = await request(`/admin/locations${query}`);
+
+        const pageItems = asArray(data);
+        all.push(...pageItems);
+
+        const meta = asObject(data);
+        lastPage = Number(meta.last_page ?? meta.lastPage ?? 1) || 1;
+        page += 1;
+      }
+
+      return all.map(mapLocationToUi);
     },
     create: async (data: AnyRecord) => {
       const defaults = await getDefaultIds();

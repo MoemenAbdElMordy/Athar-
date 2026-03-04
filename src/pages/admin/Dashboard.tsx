@@ -23,7 +23,9 @@ import {
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
 import { Badge } from "../../components/ui/badge";
+import { Button } from "../../components/ui/button";
 import { api } from "../../utils/server-api";
+import { toast } from "sonner";
 
 const initialKpiData = [
   { title: "Total Places", value: "...", icon: MapPin, color: "bg-blue-500", change: "+12%" },
@@ -73,7 +75,44 @@ export default function Dashboard() {
   const [kpiData, setKpiData] = useState(initialKpiData);
   const [chartData, setChartData] = useState(buildEmptyWeeklySeries());
   const [recentActivity, setRecentActivity] = useState<any[]>([]);
+  const [pendingVolunteerRequests, setPendingVolunteerRequests] = useState<any[]>([]);
+  const [volunteerAccounts, setVolunteerAccounts] = useState<any[]>([]);
+  const [userAccounts, setUserAccounts] = useState<any[]>([]);
   const [isMounted, setIsMounted] = useState(false);
+
+  const loadAccounts = async () => {
+    const accounts = await api.accounts.getAll();
+    setPendingVolunteerRequests(Array.isArray(accounts.pending_volunteer_requests) ? accounts.pending_volunteer_requests : []);
+    setVolunteerAccounts(Array.isArray(accounts.volunteer_accounts) ? accounts.volunteer_accounts : []);
+    setUserAccounts(Array.isArray(accounts.user_accounts) ? accounts.user_accounts : []);
+
+    setKpiData((prev) => prev.map((item) => {
+      if (item.title === "Active Volunteers") {
+        return { ...item, value: String(accounts?.counts?.volunteers ?? 0) };
+      }
+      return item;
+    }));
+  };
+
+  const handleApproveVolunteer = async (id: number) => {
+    try {
+      await api.accounts.approveVolunteer(id);
+      await loadAccounts();
+      toast.success("Volunteer request approved");
+    } catch {
+      toast.error("Failed to approve volunteer request");
+    }
+  };
+
+  const handleRejectVolunteer = async (id: number) => {
+    try {
+      await api.accounts.rejectVolunteer(id);
+      await loadAccounts();
+      toast.success("Volunteer request rejected");
+    } catch {
+      toast.error("Failed to reject volunteer request");
+    }
+  };
 
   useEffect(() => {
     setIsMounted(true);
@@ -161,6 +200,10 @@ export default function Dashboard() {
     };
     
     fetchDashboard();
+    loadAccounts().catch((error) => {
+      console.error("Failed to load account data", error);
+      toast.error("Failed to load volunteer and user accounts");
+    });
   }, []);
 
   return (
@@ -243,6 +286,80 @@ export default function Dashboard() {
                     </BarChart>
                   </ResponsiveContainer>
                 )}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+          <Card className="border-none shadow-sm">
+            <CardHeader>
+              <CardTitle className="text-lg font-bold text-[#1F3C5B]">Volunteer Registration Requests</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {pendingVolunteerRequests.length > 0 ? pendingVolunteerRequests.slice(0, 8).map((account) => (
+                  <div key={account.id} className="rounded-lg border border-slate-100 p-4">
+                    <div className="flex items-center justify-between gap-3">
+                      <div>
+                        <p className="text-sm font-semibold text-[#1F3C5B]">{account.full_name || account.name || `Volunteer #${account.id}`}</p>
+                        <p className="text-xs text-slate-500">{account.email || "No email"}</p>
+                        <p className="text-xs text-slate-500">{account.phone || "No phone"}</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={() => handleApproveVolunteer(account.id)}>
+                          Accept
+                        </Button>
+                        <Button size="sm" variant="outline" className="text-red-600 border-red-200 hover:bg-red-50" onClick={() => handleRejectVolunteer(account.id)}>
+                          Refuse
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                )) : (
+                  <p className="text-sm text-slate-500">No pending volunteer requests.</p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-none shadow-sm">
+            <CardHeader>
+              <CardTitle className="text-lg font-bold text-[#1F3C5B]">Accounts Overview</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 gap-6">
+                <div>
+                  <h4 className="text-sm font-semibold text-slate-700 mb-2">Volunteer Accounts</h4>
+                  <div className="space-y-2">
+                    {volunteerAccounts.slice(0, 6).map((account) => (
+                      <div key={`vol-${account.id}`} className="flex items-center justify-between rounded-md bg-slate-50 px-3 py-2">
+                        <div>
+                          <p className="text-sm text-[#1F3C5B] font-medium">{account.full_name || account.name || `Volunteer #${account.id}`}</p>
+                          <p className="text-xs text-slate-500">{account.email || "No email"}</p>
+                        </div>
+                        <Badge variant="outline" className="text-emerald-700 border-emerald-200 bg-emerald-50">Volunteer</Badge>
+                      </div>
+                    ))}
+                    {volunteerAccounts.length === 0 && <p className="text-sm text-slate-500">No volunteer accounts found.</p>}
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="text-sm font-semibold text-slate-700 mb-2">User Accounts</h4>
+                  <div className="space-y-2">
+                    {userAccounts.slice(0, 6).map((account) => (
+                      <div key={`user-${account.id}`} className="flex items-center justify-between rounded-md bg-slate-50 px-3 py-2">
+                        <div>
+                          <p className="text-sm text-[#1F3C5B] font-medium">{account.full_name || account.name || `User #${account.id}`}</p>
+                          <p className="text-xs text-slate-500">{account.email || "No email"}</p>
+                        </div>
+                        <Badge variant="outline" className="text-blue-700 border-blue-200 bg-blue-50">User</Badge>
+                      </div>
+                    ))}
+                    {userAccounts.length === 0 && <p className="text-sm text-slate-500">No user accounts found.</p>}
+                  </div>
+                </div>
               </div>
             </CardContent>
           </Card>

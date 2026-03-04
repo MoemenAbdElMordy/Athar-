@@ -43,6 +43,7 @@ export default function Places() {
   const [places, setPlaces] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [newPlace, setNewPlace] = useState({
     name: "",
@@ -118,6 +119,16 @@ export default function Places() {
     p.category?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     p.city?.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const pageSize = 10;
+  const totalPages = Math.max(1, Math.ceil(filteredPlaces.length / pageSize));
+  const startIndex = (currentPage - 1) * pageSize;
+  const endIndex = startIndex + pageSize;
+  const pagedPlaces = filteredPlaces.slice(startIndex, endIndex);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, places.length]);
 
   return (
     <AdminLayout title="Manage Places">
@@ -246,8 +257,8 @@ export default function Places() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-50">
-                  {filteredPlaces.length > 0 ? (
-                    filteredPlaces.map((place: any) => (
+                  {pagedPlaces.length > 0 ? (
+                    pagedPlaces.map((place: any) => (
                       <tr key={place.id} className="hover:bg-slate-50/80 transition-colors group">
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-3">
@@ -339,6 +350,43 @@ export default function Places() {
             )}
           </div>
         </div>
+
+        {!loading && filteredPlaces.length > 0 && (
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-2">
+            <div className="text-sm text-slate-500">
+              Showing <span className="font-medium text-slate-700">{Math.min(startIndex + 1, filteredPlaces.length)}</span> -{' '}
+              <span className="font-medium text-slate-700">{Math.min(endIndex, filteredPlaces.length)}</span> of{' '}
+              <span className="font-medium text-slate-700">{filteredPlaces.length}</span>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                className="rounded-xl border-slate-200 text-slate-600 gap-2"
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                disabled={currentPage <= 1}
+              >
+                <ChevronLeft size={18} />
+                <span>Previous</span>
+              </Button>
+
+              <div className="text-sm text-slate-500 min-w-[110px] text-center">
+                Page <span className="font-medium text-slate-700">{currentPage}</span> /{' '}
+                <span className="font-medium text-slate-700">{totalPages}</span>
+              </div>
+
+              <Button
+                variant="outline"
+                className="rounded-xl border-slate-200 text-slate-600 gap-2"
+                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                disabled={currentPage >= totalPages}
+              >
+                <span>Next</span>
+                <ChevronRight size={18} />
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
     </AdminLayout>
   );

@@ -9,6 +9,8 @@ import {
   AlertTriangle, 
   CheckCircle2, 
   Clock,
+  ChevronLeft,
+  ChevronRight,
   MoreVertical,
   Check,
   Trash2,
@@ -67,6 +69,7 @@ export default function Notifications() {
   const [filter, setFilter] = useState<NotificationType | 'all'>('all');
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const fetchNotifications = async () => {
     try {
@@ -115,6 +118,16 @@ export default function Notifications() {
                           n.description.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesFilter && matchesSearch;
   });
+
+  const pageSize = 10;
+  const totalPages = Math.max(1, Math.ceil(filteredNotifications.length / pageSize));
+  const startIndex = (currentPage - 1) * pageSize;
+  const endIndex = startIndex + pageSize;
+  const pagedNotifications = filteredNotifications.slice(startIndex, endIndex);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filter, searchQuery, notifications.length]);
 
   const getIcon = (type: NotificationType) => {
     switch (type) {
@@ -170,7 +183,7 @@ export default function Notifications() {
               <Loader2 className="w-8 h-8 mx-auto animate-spin text-[#1F3C5B]" />
             </div>
           ) : filteredNotifications.length > 0 ? (
-            filteredNotifications.map((notif) => (
+            pagedNotifications.map((notif) => (
               <Card 
                 key={notif.id} 
                 className={`border-none shadow-sm transition-all hover:shadow-md ${notif.status === 'unread' ? 'bg-[#EAF2FB]/30 border-l-4 border-l-[#1F3C5B]' : 'bg-white'}`}
@@ -260,6 +273,43 @@ export default function Notifications() {
             </div>
           )}
         </div>
+
+        {!loading && filteredNotifications.length > 0 && (
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-2">
+            <div className="text-sm text-slate-500">
+              Showing <span className="font-medium text-slate-700">{Math.min(startIndex + 1, filteredNotifications.length)}</span> -{' '}
+              <span className="font-medium text-slate-700">{Math.min(endIndex, filteredNotifications.length)}</span> of{' '}
+              <span className="font-medium text-slate-700">{filteredNotifications.length}</span>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                className="rounded-xl border-slate-200 text-slate-600 gap-2"
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                disabled={currentPage <= 1}
+              >
+                <ChevronLeft size={18} />
+                <span>Previous</span>
+              </Button>
+
+              <div className="text-sm text-slate-500 min-w-[110px] text-center">
+                Page <span className="font-medium text-slate-700">{currentPage}</span> /{' '}
+                <span className="font-medium text-slate-700">{totalPages}</span>
+              </div>
+
+              <Button
+                variant="outline"
+                className="rounded-xl border-slate-200 text-slate-600 gap-2"
+                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                disabled={currentPage >= totalPages}
+              >
+                <span>Next</span>
+                <ChevronRight size={18} />
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
     </AdminLayout>
   );

@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { AdminLayout } from "../../components/admin/AdminLayout";
-import { User as UserIcon, Bell, Database, ClipboardList, Accessibility, Loader2, Pencil, Trash2 } from "lucide-react";
+import { User as UserIcon, Bell, Database, ClipboardList, Accessibility, Loader2, Pencil, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
@@ -32,6 +32,9 @@ export default function Settings() {
   const [submissions, setSubmissions] = useState<any[]>([]);
   const [places, setPlaces] = useState<any[]>([]);
 
+  const [submissionsPage, setSubmissionsPage] = useState(1);
+  const [placesPage, setPlacesPage] = useState(1);
+
   const [newCategory, setNewCategory] = useState({ name: "", icon: "" });
   const [newGovernment, setNewGovernment] = useState("");
 
@@ -53,6 +56,18 @@ export default function Settings() {
     }),
     [submissions],
   );
+
+  const submissionsPageSize = 10;
+  const submissionsTotalPages = Math.max(1, Math.ceil(submissions.length / submissionsPageSize));
+  const submissionsStartIndex = (submissionsPage - 1) * submissionsPageSize;
+  const submissionsEndIndex = submissionsStartIndex + submissionsPageSize;
+  const pagedSubmissions = submissions.slice(submissionsStartIndex, submissionsEndIndex);
+
+  const placesPageSize = 10;
+  const placesTotalPages = Math.max(1, Math.ceil(places.length / placesPageSize));
+  const placesStartIndex = (placesPage - 1) * placesPageSize;
+  const placesEndIndex = placesStartIndex + placesPageSize;
+  const pagedPlaces = places.slice(placesStartIndex, placesEndIndex);
 
   const loadAdminData = async () => {
     try {
@@ -84,6 +99,14 @@ export default function Settings() {
   useEffect(() => {
     loadAdminData();
   }, []);
+
+  useEffect(() => {
+    setSubmissionsPage(1);
+  }, [submissions.length]);
+
+  useEffect(() => {
+    setPlacesPage(1);
+  }, [places.length]);
 
   const handleCreateCategory = async () => {
     if (!newCategory.name.trim()) {
@@ -356,7 +379,7 @@ export default function Settings() {
                 </div>
 
                 <div className="space-y-3">
-                  {submissions.map((item) => (
+                  {pagedSubmissions.map((item) => (
                     <div key={item.id} className="rounded-xl border border-slate-100 p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
                       <div>
                         <p className="font-semibold text-[#1F3C5B]">{item.name}</p>
@@ -374,6 +397,43 @@ export default function Settings() {
                     </div>
                   ))}
                 </div>
+
+                {!loading && submissions.length > 0 && (
+                  <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
+                    <div className="text-sm text-slate-500">
+                      Showing <span className="font-medium text-slate-700">{Math.min(submissionsStartIndex + 1, submissions.length)}</span> -{' '}
+                      <span className="font-medium text-slate-700">{Math.min(submissionsEndIndex, submissions.length)}</span> of{' '}
+                      <span className="font-medium text-slate-700">{submissions.length}</span>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        className="rounded-xl border-slate-200 text-slate-600 gap-2"
+                        onClick={() => setSubmissionsPage((p) => Math.max(1, p - 1))}
+                        disabled={submissionsPage <= 1}
+                      >
+                        <ChevronLeft size={18} />
+                        <span>Previous</span>
+                      </Button>
+
+                      <div className="text-sm text-slate-500 min-w-[110px] text-center">
+                        Page <span className="font-medium text-slate-700">{submissionsPage}</span> /{' '}
+                        <span className="font-medium text-slate-700">{submissionsTotalPages}</span>
+                      </div>
+
+                      <Button
+                        variant="outline"
+                        className="rounded-xl border-slate-200 text-slate-600 gap-2"
+                        onClick={() => setSubmissionsPage((p) => Math.min(submissionsTotalPages, p + 1))}
+                        disabled={submissionsPage >= submissionsTotalPages}
+                      >
+                        <span>Next</span>
+                        <ChevronRight size={18} />
+                      </Button>
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
           )}
@@ -392,12 +452,49 @@ export default function Settings() {
                       <SelectValue placeholder="Select place" />
                     </SelectTrigger>
                     <SelectContent>
-                      {places.map((item) => (
+                      {pagedPlaces.map((item) => (
                         <SelectItem key={item.id} value={String(item.id)}>{item.name}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
+
+                {!loading && places.length > 0 && (
+                  <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+                    <div className="text-sm text-slate-500">
+                      Showing <span className="font-medium text-slate-700">{Math.min(placesStartIndex + 1, places.length)}</span> -{' '}
+                      <span className="font-medium text-slate-700">{Math.min(placesEndIndex, places.length)}</span> of{' '}
+                      <span className="font-medium text-slate-700">{places.length}</span>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        className="rounded-xl border-slate-200 text-slate-600 gap-2"
+                        onClick={() => setPlacesPage((p) => Math.max(1, p - 1))}
+                        disabled={placesPage <= 1}
+                      >
+                        <ChevronLeft size={18} />
+                        <span>Previous</span>
+                      </Button>
+
+                      <div className="text-sm text-slate-500 min-w-[110px] text-center">
+                        Page <span className="font-medium text-slate-700">{placesPage}</span> /{' '}
+                        <span className="font-medium text-slate-700">{placesTotalPages}</span>
+                      </div>
+
+                      <Button
+                        variant="outline"
+                        className="rounded-xl border-slate-200 text-slate-600 gap-2"
+                        onClick={() => setPlacesPage((p) => Math.min(placesTotalPages, p + 1))}
+                        disabled={placesPage >= placesTotalPages}
+                      >
+                        <span>Next</span>
+                        <ChevronRight size={18} />
+                      </Button>
+                    </div>
+                  </div>
+                )}
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   {Object.entries(reportForm).map(([key, value]) => (

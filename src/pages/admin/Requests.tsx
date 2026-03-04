@@ -8,6 +8,8 @@ import {
   MapPin, 
   Clock, 
   MoreHorizontal,
+  ChevronLeft,
+  ChevronRight,
   XCircle,
   Loader2
 } from "lucide-react";
@@ -23,6 +25,7 @@ export default function Requests() {
   const [requests, setRequests] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
 
   const fetchRequests = async () => {
     try {
@@ -66,6 +69,16 @@ export default function Requests() {
     r.location?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     r.notes?.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const pageSize = 10;
+  const totalPages = Math.max(1, Math.ceil(filteredRequests.length / pageSize));
+  const startIndex = (currentPage - 1) * pageSize;
+  const endIndex = startIndex + pageSize;
+  const pagedRequests = filteredRequests.slice(startIndex, endIndex);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, requests.length]);
 
   return (
     <AdminLayout title="Help Requests Queue">
@@ -111,7 +124,7 @@ export default function Requests() {
           <div>
             {view === 'grid' ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {filteredRequests.map((request: any) => (
+                {pagedRequests.map((request: any) => (
                   <Card key={request.id} className="border-none shadow-sm hover:shadow-md transition-all group overflow-hidden bg-white">
                     <CardContent className="p-0">
                       <div className="p-6">
@@ -200,7 +213,7 @@ export default function Requests() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-50">
-                    {filteredRequests.map((request: any) => (
+                    {pagedRequests.map((request: any) => (
                       <tr key={request.id} className="hover:bg-slate-50/80 transition-colors">
                         <td className="px-6 py-4 font-bold text-[#1F3C5B]">{request.requester}</td>
                         <td className="px-6 py-4 text-sm text-slate-600">{request.location}</td>
@@ -228,6 +241,43 @@ export default function Requests() {
                     ))}
                   </tbody>
                 </table>
+              </div>
+            )}
+
+            {!loading && filteredRequests.length > 0 && (
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-3 mt-4 px-2">
+                <div className="text-sm text-slate-500">
+                  Showing <span className="font-medium text-slate-700">{Math.min(startIndex + 1, filteredRequests.length)}</span> -{' '}
+                  <span className="font-medium text-slate-700">{Math.min(endIndex, filteredRequests.length)}</span> of{' '}
+                  <span className="font-medium text-slate-700">{filteredRequests.length}</span>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    className="rounded-xl border-slate-200 text-slate-600 gap-2"
+                    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                    disabled={currentPage <= 1}
+                  >
+                    <ChevronLeft size={18} />
+                    <span>Previous</span>
+                  </Button>
+
+                  <div className="text-sm text-slate-500 min-w-[110px] text-center">
+                    Page <span className="font-medium text-slate-700">{currentPage}</span> /{' '}
+                    <span className="font-medium text-slate-700">{totalPages}</span>
+                  </div>
+
+                  <Button
+                    variant="outline"
+                    className="rounded-xl border-slate-200 text-slate-600 gap-2"
+                    onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                    disabled={currentPage >= totalPages}
+                  >
+                    <span>Next</span>
+                    <ChevronRight size={18} />
+                  </Button>
+                </div>
               </div>
             )}
           </div>
