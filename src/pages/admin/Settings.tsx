@@ -8,6 +8,7 @@ import { Switch } from "../../components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../../components/ui/card";
 import { Badge } from "../../components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select";
+import { Textarea } from "../../components/ui/textarea";
 import { toast } from "sonner";
 import { api } from "../../utils/server-api";
 
@@ -20,6 +21,17 @@ const preferenceDefaults: Preference[] = [
   { id: "maintenance", label: "Maintenance mode", description: "Temporarily disable public submissions", checked: false },
 ];
 
+const createEmptyReportForm = () => ({
+  verified: false,
+  wide_entrance: false,
+  wheelchair_accessible: false,
+  elevator_available: false,
+  ramp_available: false,
+  parking: false,
+  accessible_toilet: false,
+  notes: "",
+});
+
 export default function Settings() {
   const [activeSection, setActiveSection] = useState("Profile Information");
   const [loading, setLoading] = useState(true);
@@ -30,6 +42,8 @@ export default function Settings() {
   const [categories, setCategories] = useState<any[]>([]);
   const [governments, setGovernments] = useState<any[]>([]);
   const [submissions, setSubmissions] = useState<any[]>([]);
+  const [submissionSearch, setSubmissionSearch] = useState("");
+  const [submissionStatusFilter, setSubmissionStatusFilter] = useState("all");
   const [places, setPlaces] = useState<any[]>([]);
 
   const [submissionsPage, setSubmissionsPage] = useState(1);
@@ -39,14 +53,7 @@ export default function Settings() {
   const [newGovernment, setNewGovernment] = useState("");
 
   const [selectedLocationId, setSelectedLocationId] = useState("");
-  const [reportForm, setReportForm] = useState({
-    verified: false,
-    wide_entrance: false,
-    wheelchair_accessible: false,
-    elevator_available: false,
-    ramp_available: false,
-    parking: false,
-  });
+  const [reportForm, setReportForm] = useState(createEmptyReportForm());
 
   const selectedSubmissionStats = useMemo(
     () => ({
@@ -57,11 +64,36 @@ export default function Settings() {
     [submissions],
   );
 
+  const filteredSubmissions = useMemo(() => {
+    const q = submissionSearch.toLowerCase();
+    return submissions.filter((item) => {
+      const matchesSearch = !q ||
+        String(item.name || "").toLowerCase().includes(q) ||
+        String(item.address || "").toLowerCase().includes(q) ||
+        String(item.submitter?.full_name || item.submitter?.name || "").toLowerCase().includes(q) ||
+        String(item.category?.name || "").toLowerCase().includes(q);
+      const matchesStatus = submissionStatusFilter === "all" || item.status === submissionStatusFilter;
+      return matchesSearch && matchesStatus;
+    });
+  }, [submissions, submissionSearch, submissionStatusFilter]);
+
+  const selectedPlace = useMemo(
+    () => places.find((place) => String(place.id) === selectedLocationId),
+    [places, selectedLocationId],
+  );
+
+  const settingsStats = useMemo(() => ({
+    categories: categories.length,
+    governments: governments.length,
+    pendingSubmissions: selectedSubmissionStats.pending,
+    verifiedPlaces: places.filter((place) => place.verified).length,
+  }), [categories.length, governments.length, selectedSubmissionStats.pending, places]);
+
   const submissionsPageSize = 10;
-  const submissionsTotalPages = Math.max(1, Math.ceil(submissions.length / submissionsPageSize));
+  const submissionsTotalPages = Math.max(1, Math.ceil(filteredSubmissions.length / submissionsPageSize));
   const submissionsStartIndex = (submissionsPage - 1) * submissionsPageSize;
   const submissionsEndIndex = submissionsStartIndex + submissionsPageSize;
-  const pagedSubmissions = submissions.slice(submissionsStartIndex, submissionsEndIndex);
+  const pagedSubmissions = filteredSubmissions.slice(submissionsStartIndex, submissionsEndIndex);
 
   const placesPageSize = 10;
   const placesTotalPages = Math.max(1, Math.ceil(places.length / placesPageSize));
@@ -76,7 +108,7 @@ export default function Settings() {
         api.auth.me(),
         api.categories.getAll(),
         api.governments.getAll(),
-        api.placeSubmissions.getAll(),
+        api.placeSubmissions.getIndex(),
         api.places.getAll(),
       ]);
 
@@ -86,7 +118,7 @@ export default function Settings() {
       });
       setCategories(categoriesData);
       setGovernments(governmentsData);
-      setSubmissions(submissionsData);
+      setSubmissions(submissionsData.items || []);
       setPlaces(placesData);
     } catch (error) {
       console.error("Failed to load settings data", error);
@@ -102,11 +134,24 @@ export default function Settings() {
 
   useEffect(() => {
     setSubmissionsPage(1);
-  }, [submissions.length]);
+  }, [filteredSubmissions.length, submissionSearch, submissionStatusFilter]);
 
   useEffect(() => {
     setPlacesPage(1);
   }, [places.length]);
+
+  useEffect(() => {
+    if (!selectedPlace) {
+      setReportForm(createEmptyReportForm());
+      return;
+    }
+
+    setReportForm({
+      ...createEmptyReportForm(),
+      ...(selectedPlace.accessibility_report || {}),
+      notes: selectedPlace.accessibility_report?.notes || "",
+    });
+  }, [selectedPlace]);
 
   const handleCreateCategory = async () => {
     if (!newCategory.name.trim()) {
@@ -196,14 +241,7 @@ export default function Settings() {
     try {
       await api.places.upsertAccessibilityReport(selectedLocationId, reportForm);
       toast.success("Accessibility report saved");
-      setReportForm({
-        verified: false,
-        wide_entrance: false,
-        wheelchair_accessible: false,
-        elevator_available: false,
-        ramp_available: false,
-        parking: false,
-      });
+      await loadAdminData();
     } catch {
       toast.error("Failed to save accessibility report");
     }
@@ -250,6 +288,13 @@ export default function Settings() {
         </div>
 
         <div className="lg:col-span-2 space-y-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <Card className="border-none shadow-sm bg-white"><CardContent className="p-4"><p className="text-xs text-slate-500">Categories</p><p className="text-2xl font-bold text-[#1F3C5B] mt-1">{settingsStats.categories}</p></CardContent></Card>
+            <Card className="border-none shadow-sm bg-white"><CardContent className="p-4"><p className="text-xs text-slate-500">Governments</p><p className="text-2xl font-bold text-[#1F3C5B] mt-1">{settingsStats.governments}</p></CardContent></Card>
+            <Card className="border-none shadow-sm bg-white"><CardContent className="p-4"><p className="text-xs text-slate-500">Pending Submissions</p><p className="text-2xl font-bold text-amber-700 mt-1">{settingsStats.pendingSubmissions}</p></CardContent></Card>
+            <Card className="border-none shadow-sm bg-white"><CardContent className="p-4"><p className="text-xs text-slate-500">Verified Places</p><p className="text-2xl font-bold text-emerald-700 mt-1">{settingsStats.verifiedPlaces}</p></CardContent></Card>
+          </div>
+
           {activeSection === "Profile Information" && (
             <Card className="border-none shadow-sm bg-white overflow-hidden">
               <CardHeader className="border-b border-slate-50">
@@ -378,13 +423,32 @@ export default function Settings() {
                   <Badge className="bg-red-100 text-red-700">Rejected: {selectedSubmissionStats.rejected}</Badge>
                 </div>
 
+                <div className="flex flex-col md:flex-row gap-3">
+                  <Input value={submissionSearch} onChange={(e) => setSubmissionSearch(e.target.value)} placeholder="Search submissions by name, address, submitter, category..." className="rounded-xl" />
+                  <Select value={submissionStatusFilter} onValueChange={setSubmissionStatusFilter}>
+                    <SelectTrigger className="w-full md:w-[180px] rounded-xl"><SelectValue placeholder="Filter status" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All statuses</SelectItem>
+                      <SelectItem value="pending">Pending</SelectItem>
+                      <SelectItem value="approved">Approved</SelectItem>
+                      <SelectItem value="rejected">Rejected</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
                 <div className="space-y-3">
                   {pagedSubmissions.map((item) => (
                     <div key={item.id} className="rounded-xl border border-slate-100 p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
                       <div>
                         <p className="font-semibold text-[#1F3C5B]">{item.name}</p>
                         <p className="text-xs text-slate-500">{item.address}</p>
-                        <p className="text-xs text-slate-500">Status: {item.status}</p>
+                        <div className="flex flex-wrap gap-2 mt-2 text-xs text-slate-500">
+                          <span>Category: {item.category?.name || 'Uncategorized'}</span>
+                          <span>Submitter: {item.submitter?.full_name || item.submitter?.name || `User #${item.submitter_id ?? '-'}`}</span>
+                          <span>Status: {item.status}</span>
+                          {item.reviewer ? <span>Reviewer: {item.reviewer.full_name || item.reviewer.name}</span> : null}
+                        </div>
+                        {item.rejection_reason ? <p className="text-xs text-red-500 mt-1">Rejection reason: {item.rejection_reason}</p> : null}
                       </div>
                       {item.status === "pending" ? (
                         <div className="flex gap-2">
@@ -396,14 +460,17 @@ export default function Settings() {
                       )}
                     </div>
                   ))}
+                  {pagedSubmissions.length === 0 && (
+                    <div className="rounded-xl border border-dashed border-slate-200 p-8 text-center text-sm text-slate-500">No submissions found for the current filters.</div>
+                  )}
                 </div>
 
-                {!loading && submissions.length > 0 && (
+                {!loading && filteredSubmissions.length > 0 && (
                   <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
                     <div className="text-sm text-slate-500">
-                      Showing <span className="font-medium text-slate-700">{Math.min(submissionsStartIndex + 1, submissions.length)}</span> -{' '}
-                      <span className="font-medium text-slate-700">{Math.min(submissionsEndIndex, submissions.length)}</span> of{' '}
-                      <span className="font-medium text-slate-700">{submissions.length}</span>
+                      Showing <span className="font-medium text-slate-700">{Math.min(submissionsStartIndex + 1, filteredSubmissions.length)}</span> -{' '}
+                      <span className="font-medium text-slate-700">{Math.min(submissionsEndIndex, filteredSubmissions.length)}</span> of{' '}
+                      <span className="font-medium text-slate-700">{filteredSubmissions.length}</span>
                     </div>
 
                     <div className="flex items-center gap-2">
@@ -452,12 +519,32 @@ export default function Settings() {
                       <SelectValue placeholder="Select place" />
                     </SelectTrigger>
                     <SelectContent>
-                      {pagedPlaces.map((item) => (
+                      {places.map((item) => (
                         <SelectItem key={item.id} value={String(item.id)}>{item.name}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
+
+                {selectedPlace && (
+                  <div className="rounded-2xl border border-slate-100 p-4 bg-slate-50">
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                      <div>
+                        <p className="font-semibold text-[#1F3C5B]">{selectedPlace.name}</p>
+                        <p className="text-xs text-slate-500">{selectedPlace.address}</p>
+                      </div>
+                      <div className="flex gap-2 flex-wrap">
+                        <Badge variant="outline" className={selectedPlace.verified ? "text-emerald-700 border-emerald-200 bg-emerald-50" : "text-slate-600 border-slate-200 bg-white"}>{selectedPlace.status}</Badge>
+                        <Badge variant="outline" className="bg-white">Rating {Number(selectedPlace.average_rating || 0).toFixed(1)}</Badge>
+                      </div>
+                    </div>
+                    <div className="flex flex-wrap gap-2 mt-3">
+                      {(selectedPlace.tags || []).length > 0 ? selectedPlace.tags.map((tag: string) => (
+                        <Badge key={tag} variant="secondary" className="bg-teal-50 text-teal-700">{tag}</Badge>
+                      )) : <span className="text-xs text-slate-500">No existing accessibility tags.</span>}
+                    </div>
+                  </div>
+                )}
 
                 {!loading && places.length > 0 && (
                   <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
@@ -498,14 +585,21 @@ export default function Settings() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   {Object.entries(reportForm).map(([key, value]) => (
+                    key !== 'notes' ? (
                     <label key={key} className="flex items-center justify-between rounded-xl border border-slate-100 p-3 text-sm">
                       <span className="capitalize text-slate-700">{key.replace(/_/g, " ")}</span>
                       <Switch
-                        checked={value}
+                        checked={Boolean(value)}
                         onCheckedChange={(checked: boolean) => setReportForm((prev) => ({ ...prev, [key]: checked }))}
                       />
                     </label>
+                    ) : null
                   ))}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="notes">Notes</Label>
+                  <Textarea id="notes" className="rounded-xl min-h-[100px]" value={reportForm.notes} onChange={(e) => setReportForm((prev) => ({ ...prev, notes: e.target.value }))} placeholder="Add admin verification notes or context..." />
                 </div>
 
                 <div className="flex justify-end">

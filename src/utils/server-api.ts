@@ -46,9 +46,18 @@ function buildQuery(params: Record<string, any>): string {
 }
 
 function toUiRequestStatus(status?: string): string {
-  if (status === 'in_progress') return 'In Progress';
-  if (status === 'resolved') return 'Resolved';
-  return 'Pending';
+  if (!status) return 'Pending';
+  switch (status) {
+    case 'in_progress': return 'In Progress';
+    case 'active': return 'In Progress';
+    case 'confirmed': return 'In Progress';
+    case 'pending_payment': return 'In Progress';
+    case 'resolved': return 'Resolved';
+    case 'completed': return 'Resolved';
+    case 'cancelled': return 'Cancelled';
+    case 'pending': return 'Pending';
+    default: return status.charAt(0).toUpperCase() + status.slice(1);
+  }
 }
 
 function toApiRequestStatus(status?: string): string {
@@ -66,17 +75,28 @@ function mapLocationToUi(location: AnyRecord): AnyRecord {
     report.ramp_available ? 'Ramp' : null,
     report.elevator_available ? 'Elevator' : null,
     report.parking ? 'Parking' : null,
+    report.accessible_toilet ? 'Toilet' : null,
   ].filter(Boolean) as string[];
 
   return {
     id: location.id,
     name: location.name,
     category: location.category?.name || `Category #${location.category_id ?? '-'}`,
+    category_id: location.category_id,
     city: location.government?.name || location.government?.accessible_locations || `Government #${location.government_id ?? '-'}`,
+    government_id: location.government_id,
+    government_name: location.government?.accessible_locations || location.government?.name || '',
     address: location.address,
-    status: 'Approved',
+    status: report.verified ? 'Verified' : Object.keys(report).length > 0 ? 'Reported' : 'Unverified',
     tags,
+    verified: Boolean(report.verified),
+    average_rating: Number(location.average_rating || 0),
+    reviews_count: Number(location.reviews_count || 0),
+    latitude: location.latitude,
+    longitude: location.longitude,
+    accessibility_report: report,
     updatedAt: location.updated_at,
+    createdAt: location.created_at,
     raw: location,
   };
 }
@@ -108,15 +128,26 @@ export const api = {
   },
 
   dashboard: {
-    getSummary: async () => {
-      const data = await request('/admin/dashboard');
+    getSummary: async (params?: { refresh?: boolean }) => {
+      const query = buildQuery({ refresh: params?.refresh ? true : undefined });
+      const data = await request(`/admin/dashboard${query}`);
       return asObject(data?.counts);
+    },
+    getFull: async (params?: { refresh?: boolean }) => {
+      const query = buildQuery({ refresh: params?.refresh ? true : undefined });
+      const data = await request(`/admin/dashboard${query}`);
+      return asObject(data);
     },
   },
 
   accounts: {
     getAll: async () => {
       const data = await request('/admin/accounts');
+      return asObject(data);
+    },
+    getVolunteerAnalytics: async (id: string | number, params?: { per_page?: number; rating?: number }) => {
+      const query = buildQuery(params || {});
+      const data = await request(`/admin/accounts/${id}/volunteer-analytics${query}`);
       return asObject(data);
     },
     create: (payload: {
@@ -170,11 +201,12 @@ export const api = {
   },
 
   places: {
-    getAll: async (params?: { search?: string; government_id?: string | number; category_id?: string | number; per_page?: number }) => {
+    getAll: async (params?: { search?: string; government_id?: string | number; category_id?: string | number; verified?: boolean | string; per_page?: number }) => {
       const perPage = Math.min(Number(params?.per_page ?? 200) || 200, 200);
       const search = params?.search ?? '';
       const governmentId = params?.government_id ?? '';
       const categoryId = params?.category_id ?? '';
+      const verified = typeof params?.verified === 'undefined' ? '' : params?.verified;
 
       const all: AnyRecord[] = [];
       let page = 1;
@@ -185,6 +217,7 @@ export const api = {
           search,
           government_id: governmentId,
           category_id: categoryId,
+          verified,
           page,
           per_page: perPage,
         });
@@ -241,6 +274,15 @@ export const api = {
   },
 
   placeSubmissions: {
+    getIndex: async (params?: { status?: string; search?: string; per_page?: number }) => {
+      const query = buildQuery({ status: params?.status || '', search: params?.search || '', per_page: params?.per_page || 100 });
+      const data = await request(`/admin/place-submissions${query}`);
+      return {
+        items: asArray(data),
+        summary: asObject(data?.summary),
+        meta: asObject(data),
+      };
+    },
     getAll: async (status = '') => {
       const query = status ? `?status=${encodeURIComponent(status)}` : '?status=';
       const data = await request(`/admin/place-submissions${query}`);
@@ -257,15 +299,38 @@ export const api = {
   },
 
   requests: {
-    getAll: async () => {
-      const data = await request('/admin/help-requests?status=all');
+    getAll: async (params?: { status?: string; assistance_type?: string; payment_method?: string; payment_completed?: boolean | string; urgency_level?: string; from?: string; to?: string }) => {
+      const query = buildQuery({ status: 'all', ...params });
+      const data = await request(`/admin/help-requests${query}`);
       return asArray(data).map((item: AnyRecord) => ({
         id: item.id,
-        requester: item.name || item.requester?.name || item.phone || `User #${item.requester_id ?? '-'}`,
+        requester: item.requester?.full_name || item.requester?.name || item.name || item.phone || `User #${item.requester_id ?? '-'}`,
+        requester_email: item.requester?.email || '',
+        requester_phone: item.requester?.phone || '',
+        volunteer: item.volunteer?.full_name || item.volunteer?.name || null,
+        volunteer_email: item.volunteer?.email || '',
         location: item.location_text || item.from_name || item.to_name || 'Unknown location',
+        from_name: item.from_name || '',
+        to_name: item.to_name || '',
         notes: item.details || item.message || 'No details',
         status: toUiRequestStatus(item.status),
+        raw_status: item.status,
+        assistance_type: item.assistance_type || '',
+        urgency_level: item.urgency_level || '',
+        payment_method: item.payment_method || '',
+        payment_completed: Boolean(item.payment_completed),
+        payment_status: item.payment_details?.status || item.payment_status || '',
+        payment_success: item.payment_details?.success ?? null,
+        payment_paid_at: item.payment_details?.paid_at || '',
+        payment_amount_egp: item.payment_details?.amount_egp ?? null,
+        service_fee: item.service_fee ? (Number(item.service_fee) / 100) : 0,
+        fee_amount: item.fee_amount_cents ? (Number(item.fee_amount_cents) / 100) : 0,
+        net_amount: item.net_amount_cents ? (Number(item.net_amount_cents) / 100) : 0,
+        rating: item.volunteer_review?.rating || null,
+        review_comment: item.volunteer_review?.comment || '',
         time: item.created_at || '',
+        accepted_at: item.accepted_at || '',
+        completed_at: item.completed_at || '',
         raw: item,
       }));
     },
@@ -299,6 +364,16 @@ export const api = {
   },
 
   tutorials: {
+    getIndex: async (params?: { search?: string; category?: string; published?: boolean | string; per_page?: number }) => {
+      const query = buildQuery({ search: params?.search || '', category: params?.category || '', published: params?.published, per_page: params?.per_page || 100 });
+      const data = await request(`/admin/tutorials${query}`);
+      return {
+        items: asArray(data),
+        summary: asObject(data?.summary),
+        categories: asArray<string>(data?.categories),
+        meta: asObject(data),
+      };
+    },
     getAll: async () => {
       const data = await request('/admin/tutorials?search=');
       return asArray(data);
@@ -306,6 +381,19 @@ export const api = {
     create: (payload: AnyRecord) => request('/admin/tutorials', { method: 'POST', body: JSON.stringify(payload) }),
     update: (id: string | number, payload: AnyRecord) => request(`/admin/tutorials/${id}`, { method: 'PUT', body: JSON.stringify(payload) }),
     delete: (id: string | number) => request(`/admin/tutorials/${id}`, { method: 'DELETE' }),
+  },
+
+  publicTutorials: {
+    getAll: async (params?: { search?: string; category?: string; per_page?: number }) => {
+      const query = buildQuery({
+        search: params?.search || '',
+        category: params?.category || '',
+        per_page: params?.per_page || 100,
+      });
+      const data = await request(`/api/tutorials${query}`);
+      return asArray(data);
+    },
+    trackView: (id: string | number) => request(`/api/tutorials/${id}/view`, { method: 'POST' }),
   },
 
   notifications: {
@@ -318,6 +406,15 @@ export const api = {
   },
 
   reports: {
+    getIndex: async (params?: { status?: string; search?: string; per_page?: number }) => {
+      const query = buildQuery({ status: params?.status || '', search: params?.search || '', per_page: params?.per_page || 100 });
+      const data = await request(`/admin/flags${query}`);
+      return {
+        items: asArray(data),
+        summary: asObject(data?.summary),
+        meta: asObject(data),
+      };
+    },
     getAll: async () => {
       const data = await request('/admin/flags?status=');
       return asArray(data);

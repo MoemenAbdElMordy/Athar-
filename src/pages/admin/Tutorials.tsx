@@ -7,7 +7,6 @@ import {
   Eye, 
   Edit2, 
   Trash2, 
-  CheckCircle, 
   Clock, 
   Globe,
   ExternalLink,
@@ -16,7 +15,8 @@ import {
   Share2,
   ArrowLeft,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Loader2
 } from "lucide-react";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
@@ -32,6 +32,7 @@ import {
   DialogDescription
 } from "../../components/ui/dialog";
 import { Label } from "../../components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select";
 import { Textarea } from "../../components/ui/textarea";
 import { toast } from "sonner";
 import { api } from "../../utils/server-api";
@@ -43,14 +44,23 @@ function mapTutorial(item: any) {
     author: "Admin",
     status: item.is_published ? "Published" : "Draft",
     date: item.created_at ? String(item.created_at).slice(0, 10) : new Date().toISOString().slice(0, 10),
-    views: "0",
+    views: Number(item.views_count || 0),
+    category: item.category || "Uncategorized",
     description: item.description || "",
+    videoUrl: item.video_url || "",
+    thumbnailUrl: item.thumbnail_url || "",
     raw: item,
   };
 }
 
 export default function TutorialsAdmin() {
   const [tutorials, setTutorials] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [categoryFilter, setCategoryFilter] = useState("all");
+  const [summary, setSummary] = useState<any>({});
+  const [categoryOptions, setCategoryOptions] = useState<string[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [showFullContent, setShowFullContent] = useState(false);
@@ -63,21 +73,33 @@ export default function TutorialsAdmin() {
     title: "",
     author: "Admin",
     status: "Draft",
-    description: ""
+    description: "",
+    category: "",
+    videoUrl: "",
+    thumbnailUrl: "",
   });
 
   const fetchTutorials = async () => {
     try {
-      const data = await api.tutorials.getAll();
-      setTutorials((data || []).map(mapTutorial));
+      setLoading(true);
+      const data = await api.tutorials.getIndex({
+        search: searchTerm,
+        category: categoryFilter === "all" ? "" : categoryFilter,
+        published: statusFilter === "all" ? undefined : statusFilter === "published",
+      });
+      setTutorials((data.items || []).map(mapTutorial));
+      setSummary(data.summary || {});
+      setCategoryOptions(Array.isArray(data.categories) ? data.categories.filter(Boolean) : []);
     } catch {
       toast.error("Failed to load tutorials");
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
     fetchTutorials();
-  }, []);
+  }, [searchTerm, statusFilter, categoryFilter]);
 
   const pageSize = 10;
   const totalPages = Math.max(1, Math.ceil(tutorials.length / pageSize));
@@ -87,12 +109,12 @@ export default function TutorialsAdmin() {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [tutorials.length]);
+  }, [tutorials.length, searchTerm, statusFilter, categoryFilter]);
 
   const handleOpenCreate = () => {
     setIsEditing(false);
     setCurrentEditId(null);
-    setFormData({ title: "", author: "Admin", status: "Draft", description: "" });
+    setFormData({ title: "", author: "Admin", status: "Draft", description: "", category: "", videoUrl: "", thumbnailUrl: "" });
     setIsDialogOpen(true);
   };
 
@@ -103,7 +125,10 @@ export default function TutorialsAdmin() {
       title: tutorial.title, 
       author: tutorial.author, 
       status: tutorial.status,
-      description: tutorial.description || ""
+      description: tutorial.description || "",
+      category: tutorial.category === "Uncategorized" ? "" : tutorial.category || "",
+      videoUrl: tutorial.videoUrl || "",
+      thumbnailUrl: tutorial.thumbnailUrl || "",
     });
     setIsDialogOpen(true);
   };
@@ -119,6 +144,9 @@ export default function TutorialsAdmin() {
         const updated = await api.tutorials.update(currentEditId, {
           title: formData.title,
           description: formData.description,
+          category: formData.category || null,
+          video_url: formData.videoUrl || null,
+          thumbnail_url: formData.thumbnailUrl || null,
           is_published: formData.status === "Published",
         });
         const mapped = mapTutorial(updated);
@@ -128,9 +156,9 @@ export default function TutorialsAdmin() {
         const created = await api.tutorials.create({
           title: formData.title,
           description: formData.description,
-          video_url: null,
-          thumbnail_url: null,
-          category: null,
+          video_url: formData.videoUrl || null,
+          thumbnail_url: formData.thumbnailUrl || null,
+          category: formData.category || null,
           is_published: formData.status === "Published",
         });
         setTutorials([mapTutorial(created), ...tutorials]);
@@ -138,6 +166,7 @@ export default function TutorialsAdmin() {
       }
 
       setIsDialogOpen(false);
+      await fetchTutorials();
     } catch {
       toast.error("Failed to save tutorial");
     }
@@ -146,7 +175,7 @@ export default function TutorialsAdmin() {
   const deleteTutorial = async (id: number) => {
     try {
       await api.tutorials.delete(id);
-      setTutorials(tutorials.filter(t => t.id !== id));
+      await fetchTutorials();
       toast.success("Tutorial deleted");
     } catch {
       toast.error("Failed to delete tutorial");
@@ -162,10 +191,36 @@ export default function TutorialsAdmin() {
   return (
     <AdminLayout title="Tutorials & Content">
       <div className="space-y-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <Card className="border-none shadow-sm"><CardContent className="p-4"><p className="text-xs text-slate-500">Total Tutorials</p><p className="text-2xl font-bold text-[#1F3C5B] mt-1">{Number(summary.total ?? tutorials.length)}</p></CardContent></Card>
+          <Card className="border-none shadow-sm"><CardContent className="p-4"><p className="text-xs text-slate-500">Published</p><p className="text-2xl font-bold text-emerald-700 mt-1">{Number(summary.published ?? tutorials.filter((item) => item.status === "Published").length)}</p></CardContent></Card>
+          <Card className="border-none shadow-sm"><CardContent className="p-4"><p className="text-xs text-slate-500">Drafts</p><p className="text-2xl font-bold text-amber-700 mt-1">{Number(summary.draft ?? tutorials.filter((item) => item.status !== "Published").length)}</p></CardContent></Card>
+          <Card className="border-none shadow-sm"><CardContent className="p-4"><p className="text-xs text-slate-500">Categories</p><p className="text-2xl font-bold text-[#1F3C5B] mt-1">{categoryOptions.length}</p></CardContent></Card>
+        </div>
+
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-            <Input placeholder="Search articles..." className="pl-10 rounded-xl bg-white border-slate-200" />
+          <div className="flex flex-1 gap-3 flex-col md:flex-row">
+            <div className="relative flex-1 max-w-md">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+              <Input placeholder="Search articles..." className="pl-10 rounded-xl bg-white border-slate-200" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+            </div>
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-[180px] rounded-xl bg-white border-slate-200"><SelectValue placeholder="Status" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All statuses</SelectItem>
+                <SelectItem value="published">Published</SelectItem>
+                <SelectItem value="draft">Drafts</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+              <SelectTrigger className="w-[200px] rounded-xl bg-white border-slate-200"><SelectValue placeholder="Category" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All categories</SelectItem>
+                {categoryOptions.map((category) => (
+                  <SelectItem key={category} value={category}>{category}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -211,6 +266,13 @@ export default function TutorialsAdmin() {
                     />
                   </div>
                   <div className="space-y-2">
+                    <Label htmlFor="category" className="text-[#1F3C5B] font-bold">Category</Label>
+                    <Input id="category" value={formData.category} className="rounded-xl border-slate-200" onChange={(e) => setFormData({ ...formData, category: e.target.value })} placeholder="e.g. Mobility" />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
                     <Label htmlFor="status" className="text-[#1F3C5B] font-bold">Status</Label>
                     <select 
                       id="status"
@@ -222,6 +284,15 @@ export default function TutorialsAdmin() {
                       <option value="Published">Published</option>
                     </select>
                   </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="videoUrl" className="text-[#1F3C5B] font-bold">Video URL</Label>
+                    <Input id="videoUrl" value={formData.videoUrl} className="rounded-xl border-slate-200" onChange={(e) => setFormData({ ...formData, videoUrl: e.target.value })} placeholder="https://..." />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="thumbnailUrl" className="text-[#1F3C5B] font-bold">Thumbnail URL</Label>
+                  <Input id="thumbnailUrl" value={formData.thumbnailUrl} className="rounded-xl border-slate-200" onChange={(e) => setFormData({ ...formData, thumbnailUrl: e.target.value })} placeholder="https://..." />
                 </div>
 
                 <div className="space-y-2">
@@ -261,6 +332,10 @@ export default function TutorialsAdmin() {
                 <Badge className="bg-[#C9A24D] text-white hover:bg-[#C9A24D] px-4 py-1 rounded-full">
                   Tutorial Preview
                 </Badge>
+                <div className="flex gap-2 flex-wrap">
+                  <Badge variant="outline" className="bg-white">{selectedTutorial?.category || "Uncategorized"}</Badge>
+                  <Badge className={selectedTutorial?.status === "Published" ? "bg-green-100 text-green-700" : "bg-slate-100 text-slate-600"}>{selectedTutorial?.status}</Badge>
+                </div>
                 <h1 className="text-3xl md:text-5xl font-extrabold text-[#1F3C5B] leading-tight">
                   {selectedTutorial?.title}
                 </h1>
@@ -308,6 +383,12 @@ export default function TutorialsAdmin() {
                           <Share2 size={16} />
                           Share
                         </Button>
+                        {selectedTutorial?.videoUrl ? (
+                          <Button variant="outline" className="rounded-xl border-slate-200 gap-2" onClick={() => window.open(selectedTutorial.videoUrl, '_blank', 'noopener,noreferrer')}>
+                            <ExternalLink size={16} />
+                            Open Video
+                          </Button>
+                        ) : null}
                       </div>
                       <Button 
                         className="bg-[#1F3C5B] text-white rounded-xl px-6"
@@ -366,75 +447,92 @@ export default function TutorialsAdmin() {
           </DialogContent>
         </Dialog>
 
-        <div className="grid grid-cols-1 gap-4">
-          {pagedTutorials.map((item) => (
-            <Card key={item.id} className="border-none shadow-sm hover:shadow-md transition-all group overflow-hidden bg-white border border-slate-100">
-              <CardContent className="p-0">
-                <div className="p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center text-[#C9A24D]">
-                      <FileText size={24} />
+        {loading ? (
+          <div className="bg-white rounded-3xl shadow-sm p-16 flex flex-col items-center gap-4">
+            <Loader2 className="w-10 h-10 animate-spin text-[#1F3C5B]" />
+            <p className="text-slate-500 font-medium">Loading tutorials...</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-4">
+            {pagedTutorials.map((item) => (
+              <Card key={item.id} className="border-none shadow-sm hover:shadow-md transition-all group overflow-hidden bg-white border border-slate-100">
+                <CardContent className="p-0">
+                  <div className="p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center text-[#C9A24D]">
+                        <FileText size={24} />
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <h3 className="font-bold text-[#1F3C5B] text-lg">{item.title}</h3>
+                          <Badge variant="outline" className="bg-slate-50">{item.category}</Badge>
+                        </div>
+                        <div className="flex items-center gap-4 mt-1 flex-wrap">
+                          <span className="text-xs text-slate-400 flex items-center gap-1">
+                            <UserIcon size={12} /> {item.author}
+                          </span>
+                          <span className="text-xs text-slate-400 flex items-center gap-1">
+                            <Clock size={12} /> {item.date}
+                          </span>
+                          <span className="text-xs text-slate-400 flex items-center gap-1">
+                            <Eye size={12} /> {item.views} views
+                          </span>
+                          {item.videoUrl ? <span className="text-xs text-emerald-600">Video attached</span> : null}
+                          {item.status === "Published" ? <span className="text-xs text-blue-600">Visible on public tutorials page</span> : null}
+                        </div>
+                      </div>
                     </div>
-                    <div>
-                      <h3 className="font-bold text-[#1F3C5B] text-lg">{item.title}</h3>
-                      <div className="flex items-center gap-4 mt-1">
-                        <span className="text-xs text-slate-400 flex items-center gap-1">
-                          <UserIcon size={12} /> {item.author}
-                        </span>
-                        <span className="text-xs text-slate-400 flex items-center gap-1">
-                          <Clock size={12} /> {item.date}
-                        </span>
-                        <span className="text-xs text-slate-400 flex items-center gap-1">
-                          <Eye size={12} /> {item.views} views
-                        </span>
+
+                    <div className="flex items-center justify-between md:justify-end gap-3 w-full md:w-auto">
+                      <Badge className={
+                        item.status === "Published" 
+                          ? "bg-green-100 text-green-700 hover:bg-green-100" 
+                          : "bg-slate-100 text-slate-500 hover:bg-slate-100"
+                      }>
+                        {item.status === "Published" ? <Globe size={12} className="mr-1" /> : <Clock size={12} className="mr-1" />}
+                        {item.status}
+                      </Badge>
+                      
+                      <div className="flex items-center gap-1">
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-9 w-9 rounded-lg text-slate-400 hover:text-[#1F3C5B] hover:bg-slate-100"
+                          onClick={() => handleOpenEdit(item)}
+                        >
+                          <Edit2 size={18} />
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-9 w-9 rounded-lg text-slate-400 hover:text-[#1F3C5B] hover:bg-slate-100"
+                          onClick={() => handleViewPreview(item)}
+                        >
+                          <ExternalLink size={18} />
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-9 w-9 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50"
+                          onClick={() => deleteTutorial(item.id)}
+                        >
+                          <Trash2 size={18} />
+                        </Button>
                       </div>
                     </div>
                   </div>
+                </CardContent>
+              </Card>
+            ))}
+            {pagedTutorials.length === 0 && (
+              <Card className="border-none shadow-sm bg-white border border-slate-100">
+                <CardContent className="p-12 text-center text-slate-500">No tutorials found for the current filters.</CardContent>
+              </Card>
+            )}
+          </div>
+        )}
 
-                  <div className="flex items-center justify-between md:justify-end gap-3 w-full md:w-auto">
-                    <Badge className={
-                      item.status === "Published" 
-                        ? "bg-green-100 text-green-700 hover:bg-green-100" 
-                        : "bg-slate-100 text-slate-500 hover:bg-slate-100"
-                    }>
-                      {item.status === "Published" ? <Globe size={12} className="mr-1" /> : <Clock size={12} className="mr-1" />}
-                      {item.status}
-                    </Badge>
-                    
-                    <div className="flex items-center gap-1">
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className="h-9 w-9 rounded-lg text-slate-400 hover:text-[#1F3C5B] hover:bg-slate-100"
-                        onClick={() => handleOpenEdit(item)}
-                      >
-                        <Edit2 size={18} />
-                      </Button>
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className="h-9 w-9 rounded-lg text-slate-400 hover:text-[#1F3C5B] hover:bg-slate-100"
-                        onClick={() => handleViewPreview(item)}
-                      >
-                        <ExternalLink size={18} />
-                      </Button>
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className="h-9 w-9 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50"
-                        onClick={() => deleteTutorial(item.id)}
-                      >
-                        <Trash2 size={18} />
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        {tutorials.length > 0 && (
+        {!loading && tutorials.length > 0 && (
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-2">
             <div className="text-sm text-slate-500">
               Showing <span className="font-medium text-slate-700">{Math.min(startIndex + 1, tutorials.length)}</span> -{' '}
